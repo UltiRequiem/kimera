@@ -3,3 +3,5 @@ globalThis.console = {
     globalThis.__dispatch("console", ...args);
   },
 };
+
+globalThis.window = globalThis;

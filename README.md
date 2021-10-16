@@ -8,10 +8,20 @@
 
 A super fast and lightweight JavaScript Runtime for Scripts.
 
-## Usage
+## Getting Started
 
 ```
-kimera myScript.js
+// myScript.ts
+const asyncSayHello = async (text) => {
+  console.log(text);
+};
+
+(async () => await asyncSayHello("Hello World!"))();
+```
+
+```
+$ kimera myScript.js
+Hello World!
 ```
 
 ### Installation
@@ -19,8 +29,6 @@ kimera myScript.js
 ```bash
 go install github.com/UltiRequiem/kimera@latest
 ```
-
-Or use a binary from [releases](https://github.com/UltiRequiem/chigo/releases/latest).
 
 ### License
 

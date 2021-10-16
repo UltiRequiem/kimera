@@ -22,17 +22,17 @@ func RunFile(fileToRun string) {
 
 	runtimejs := quickjs.NewRuntime()
 	defer runtimejs.Free()
-	context := runtimejs.NewContext()
-	defer context.Free()
+	ctx := runtimejs.NewContext()
+	defer ctx.Free()
 
-	globals := context.Globals()
-	globals.Set("__dispatch", context.Function(Globals))
+	globals := ctx.Globals()
+	globals.Set("__dispatch", ctx.Function(Globals))
 
-	k, errorInjectingGlobals := context.Eval(codeGlobals)
+	k, errorInjectingGlobals := ctx.Eval(codeGlobals)
 	CheckJSError(errorInjectingGlobals)
 	defer k.Free()
 
-	result, error := context.EvalFile(string(code), "s")
+	result, error := ctx.EvalFile(string(code), "s")
 
 	CheckJSError(error)
 

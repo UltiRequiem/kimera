@@ -7,7 +7,7 @@ import (
 
 func Execute() *cobra.Command {
 	var rootCmd = &cobra.Command{
-		Use:   "Runs the REPL",
+		Use:   "Runs the REPL.",
 		Short: "",
 		Run: func(cmd *cobra.Command, args []string) {
 			core.Repl()
@@ -16,7 +16,7 @@ func Execute() *cobra.Command {
 
 	var runCmd = &cobra.Command{
 		Use:   "run [file]",
-		Short: "Run a JavaScript or TypeScript file.",
+		Short: "Run a JavaScript file.",
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			core.RunFile(args[0])
@@ -26,5 +26,4 @@ func Execute() *cobra.Command {
 	rootCmd.AddCommand(runCmd)
 
 	return rootCmd
-
 }
