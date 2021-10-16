@@ -6,7 +6,21 @@
 ![CodeQL](https://github.com/UltiRequiem/kimera/workflows/CodeQL/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/UltiRequiem/kimera)](https://goreportcard.com/report/github.com/UltiRequiem/chigo)
 
-A super fast JavaScript Runtime for Scripts.
+A super fast and lightweight JavaScript Runtime for Scripts.
+
+## Usage
+
+```
+kimera myScript.js
+```
+
+### Installation
+
+```bash
+go install github.com/UltiRequiem/kimera@latest
+```
+
+Or use a binary from [releases](https://github.com/UltiRequiem/chigo/releases/latest).
 
 ### License
 
