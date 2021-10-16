@@ -7,4 +7,9 @@ require (
 	github.com/lithdew/quickjs v0.0.0-20200714182134-aaa42285c9d2
 )
 
-require golang.org/x/sys v0.0.0-20200501145240-bc7a7d42d5c3 // indirect
+require (
+	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/spf13/cobra v1.2.1 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
+)

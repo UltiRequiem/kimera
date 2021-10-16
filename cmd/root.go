@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 
@@ -8,8 +9,15 @@ import (
 	"github.com/lithdew/quickjs"
 )
 
-func Main(codeGlobals string) {
+func Execute(codeGlobals string) {
 	runtime.LockOSThread()
+
+	multipleArgs, _ := flagsArgs()
+
+	if !multipleArgs {
+		fmt.Println("The REPL is not available yet.")
+		os.Exit(1)
+	}
 
 	fileToRun := os.Args[1:][0]
 
