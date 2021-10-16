@@ -1,4 +1,4 @@
-const asyncSayHello = async (text: string) => {
+const asyncSayHello = async (text) => {
   console.log(text);
 };
 
