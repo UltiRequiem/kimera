@@ -7,7 +7,7 @@ import (
 	"github.com/lithdew/quickjs"
 )
 
-func CheckJSError(err error) {
+func CheckJSError(err error, shouldPanic bool) {
 	if err != nil {
 		var evalErr *quickjs.Error
 
@@ -16,6 +16,8 @@ func CheckJSError(err error) {
 			fmt.Println(evalErr.Stack)
 		}
 
-		panic(err)
+		if shouldPanic {
+			panic(err)
+		}
 	}
 }

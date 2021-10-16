@@ -14,6 +14,14 @@ func Execute() *cobra.Command {
 		},
 	}
 
+	var versionCmd = &cobra.Command{
+		Use: "version",
+                Short: "Print the version.",
+		Run: func(cmd *cobra.Command, args []string) {
+			core.PrintVersion()
+		},
+	}
+
 	var runCmd = &cobra.Command{
 		Use:   "run [file]",
 		Short: "Run a JavaScript file.",
@@ -23,7 +31,7 @@ func Execute() *cobra.Command {
 		},
 	}
 
-	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(runCmd, versionCmd)
 
 	return rootCmd
 }

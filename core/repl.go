@@ -36,20 +36,17 @@ func Eval(text string, buffer *string) string {
 	globalsEval.Set("__dispatch", ctx.Function(Globals))
 
 	k, errorInjectingGlobals := ctx.Eval(codeGlobals)
-	CheckJSError(errorInjectingGlobals)
+	CheckJSError(errorInjectingGlobals, false)
 	defer k.Free()
 
 	result, err := ctx.Eval(*buffer + text)
 
 	if err != nil {
-		var evalErr *quickjs.Error
-		if errors.As(err, &evalErr) {
-			fmt.Println(evalErr.Cause)
-			fmt.Println(evalErr.Stack)
-		}
-	} else {
-		*buffer += fmt.Sprintf(";undefined; %s", text)
+		CheckJSError(err, false)
+		return result.String()
 	}
+
+	*buffer += fmt.Sprintf(";undefined; %s", text)
 
 	result.Free()
 

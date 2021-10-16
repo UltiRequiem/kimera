@@ -1,8 +1,8 @@
 package core
 
 import (
+	_ "embed"
 	"os"
-        _ "embed"
 	"runtime"
 
 	"github.com/lithdew/quickjs"
@@ -15,7 +15,7 @@ func RunFile(fileToRun string) {
 
 	code, errorReadingFile := os.ReadFile(fileToRun)
 
-	CheckJSError(errorReadingFile)
+	CheckJSError(errorReadingFile, true)
 
 	// Ensure that always operates in the exact same thread
 	runtime.LockOSThread()
@@ -29,12 +29,12 @@ func RunFile(fileToRun string) {
 	globals.Set("__dispatch", ctx.Function(Globals))
 
 	k, errorInjectingGlobals := ctx.Eval(codeGlobals)
-	CheckJSError(errorInjectingGlobals)
+	CheckJSError(errorInjectingGlobals, true)
 	defer k.Free()
 
 	result, error := ctx.EvalFile(string(code), "s")
 
-	CheckJSError(error)
+	CheckJSError(error, true)
 
 	result.Free()
 }
