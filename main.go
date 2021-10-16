@@ -2,13 +2,18 @@ package main
 
 import (
 	_ "embed"
+	"fmt"
+	"os"
 
 	"github.com/UltiRequiem/kimera/cmd"
 )
 
-//go:embed std/*
-var s string
-
 func main() {
-	cmd.Main(s)
+	program := cmd.Execute()
+
+	if err := program.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 }

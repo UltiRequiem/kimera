@@ -1,50 +1,30 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-	"runtime"
-
-	"github.com/evanw/esbuild/pkg/api"
-	"github.com/lithdew/quickjs"
+	"github.com/UltiRequiem/kimera/core"
+	"github.com/spf13/cobra"
 )
 
-func Execute(codeGlobals string) {
-	runtime.LockOSThread()
-
-	multipleArgs, _ := flagsArgs()
-
-	if !multipleArgs {
-		fmt.Println("The REPL is not available yet.")
-		os.Exit(1)
+func Execute() *cobra.Command {
+	var rootCmd = &cobra.Command{
+		Use:   "Runs the REPL",
+		Short: "",
+		Run: func(cmd *cobra.Command, args []string) {
+			core.Repl()
+		},
 	}
 
-	fileToRun := os.Args[1:][0]
+	var runCmd = &cobra.Command{
+		Use:   "run [file]",
+		Short: "Run a JavaScript or TypeScript file.",
+		Args:  cobra.MinimumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			core.RunFile(args[0])
+		},
+	}
 
-	jsruntime := quickjs.NewRuntime()
-	defer jsruntime.Free()
+	rootCmd.AddCommand(runCmd)
 
-	context := jsruntime.NewContext()
-	defer context.Free()
+	return rootCmd
 
-	globals := context.Globals()
-	globals.Set("__dispatch", context.Function(Globals))
-
-	k, errorInjectingGlobals := context.Eval(codeGlobals)
-	CheckJSError(errorInjectingGlobals)
-	defer k.Free()
-
-	bundle := api.Build(api.BuildOptions{
-		EntryPoints: []string{fileToRun},
-		Outfile:     "output.js",
-		Bundle:      true,
-		Target:      api.ES2015,
-		Write:       true,
-		LogLevel:    api.LogLevelInfo,
-	})
-	defer os.Remove("output.js")
-
-	result, errorEvaluatingFile := context.EvalFile(string(bundle.OutputFiles[0].Contents[:]), "s")
-	CheckJSError(errorEvaluatingFile)
-	result.Free()
 }
