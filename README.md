@@ -10,8 +10,8 @@ A super fast and lightweight JavaScript Runtime for Scripts.
 
 ## Getting Started
 
-```
-// myScript.ts
+```javascript
+// myScript.js
 const asyncSayHello = async (text) => {
   console.log(text);
 };
@@ -19,9 +19,15 @@ const asyncSayHello = async (text) => {
 (async () => await asyncSayHello("Hello World!"))();
 ```
 
-```
+```bash
 $ kimera myScript.js
 Hello World!
+```
+
+## REPL
+
+```bash
+kimera
 ```
 
 ### Installation
