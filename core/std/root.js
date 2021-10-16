@@ -4,4 +4,6 @@ globalThis.console = {
   },
 };
 
+globalThis.close = () => globalThis.__dispatch("close");
+
 globalThis.window = globalThis;

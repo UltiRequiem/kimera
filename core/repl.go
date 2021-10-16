@@ -2,7 +2,6 @@ package core
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"os"
 
