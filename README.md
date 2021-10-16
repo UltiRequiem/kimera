@@ -20,7 +20,7 @@ const asyncSayHello = async (text) => {
 ```
 
 ```bash
-$ kimera myScript.js
+$ kimera run myScript.js
 Hello World!
 ```
 
