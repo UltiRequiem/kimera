@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func main() *cobra.Command {
+func Execute() *cobra.Command {
 	var rootCmd = &cobra.Command{
 		Use:   "Runs the REPL.",
 		Short: "",
