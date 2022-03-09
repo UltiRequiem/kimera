@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Execute() *cobra.Command {
+func main() *cobra.Command {
 	var rootCmd = &cobra.Command{
 		Use:   "Runs the REPL.",
 		Short: "",
@@ -15,21 +15,28 @@ func Execute() *cobra.Command {
 	}
 
 	var versionCmd = &cobra.Command{
-		Use: "version",
-                Short: "Print the version.",
+		Use:   "version",
+		Short: "Print the version.",
 		Run: func(cmd *cobra.Command, args []string) {
 			core.PrintVersion()
 		},
 	}
 
+	var fsFlag bool
+	var netFlag bool
+	var envFlag bool
+
 	var runCmd = &cobra.Command{
 		Use:   "run [file]",
 		Short: "Run a JavaScript file.",
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			core.RunFile(args[0])
 		},
 	}
+	runCmd.Flags().BoolVar(&fsFlag, "fs", false, "Allow file system access")
+	runCmd.Flags().BoolVar(&netFlag, "net", false, "Allow net access")
+	runCmd.Flags().BoolVar(&envFlag, "env", false, "Allow Environment Variables access")
 
 	rootCmd.AddCommand(runCmd, versionCmd)
 
