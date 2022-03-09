@@ -1,9 +1,17 @@
-globalThis.console = {
-  log: (...args) => {
+const console = {
+  log(...args) {
     globalThis.__dispatch("console", ...args);
   },
 };
 
-globalThis.close = () => globalThis.__dispatch("close");
+function close() {
+  globalThis.__dispatch("close");
+}
+
+globalThis = {
+  ...globalThis,
+  console,
+  close,
+};
 
 globalThis.window = globalThis;
