@@ -1,0 +1,38 @@
+name: Test Suite
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: ["1.17"]
+    name: Go ${{ matrix.go }} test
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Build kimera
+        run: go build -o kimera
+      - name: Run test suite
+        run: |
+          echo "Running test suite..."
+          test_failed=0
+          for file in testings/*.js testings/*.ts; do
+            if [ -f "$file" ]; then
+              echo "=== Running $file ==="
+              if ./kimera run "$file"; then
+                echo "✓ $file passed"
+              else
+                echo "✗ $file failed"
+                test_failed=1
+              fi
+              echo ""
+            fi
+          done
+          if [ $test_failed -eq 1 ]; then
+            echo "Some tests failed!"
+            exit 1
+          fi
+          echo "All tests passed!"
