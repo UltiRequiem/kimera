@@ -12,7 +12,7 @@ function fetch(url, options = {}) {
   const optionsJSON = JSON.stringify(options);
   const responseJSON = globalThis.__dispatch("fetch", url, optionsJSON);
   const response = JSON.parse(responseJSON);
-  
+
   return {
     ok: response.ok,
     status: response.status,

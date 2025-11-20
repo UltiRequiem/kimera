@@ -22,7 +22,8 @@ Hello World!
 
 ## Features
 
-Kimera.js provides a lightweight JavaScript/TypeScript runtime with the following capabilities:
+Kimera.js provides a lightweight JavaScript/TypeScript runtime with the
+following capabilities:
 
 ### 1. Interactive REPL
 
@@ -33,6 +34,7 @@ kimera
 ```
 
 The REPL supports:
+
 - Multi-line statements
 - Variable persistence across commands
 - Full JavaScript ES6+ syntax
@@ -49,7 +51,8 @@ kimera run myScript.ts
 
 ### 3. TypeScript Support
 
-Native TypeScript support out of the box - no configuration needed. Kimera automatically transpiles TypeScript files using esbuild:
+Native TypeScript support out of the box - no configuration needed. Kimera
+automatically transpiles TypeScript files using esbuild:
 
 ```typescript
 const greet = (name: string): void => {
@@ -62,6 +65,7 @@ greet("World");
 ### 4. Modern JavaScript Features
 
 Full support for modern JavaScript syntax including:
+
 - Async/await
 - Arrow functions
 - Template literals
@@ -70,12 +74,13 @@ Full support for modern JavaScript syntax including:
 - Promises
 
 Example:
+
 ```javascript
 const fetchData = async () => {
   return "Data loaded";
 };
 
-fetchData().then(data => console.log(data));
+fetchData().then((data) => console.log(data));
 ```
 
 ### 5. Console API
@@ -126,6 +131,7 @@ try {
 ### 7. Global Objects
 
 Kimera provides the following global objects:
+
 - `console` - Console logging API
 - `Kimera` - File system and runtime API
 - `close()` - Function to exit the runtime
@@ -151,8 +157,8 @@ const postResponse = fetch("https://api.example.com/data", {
   method: "POST",
   body: JSON.stringify({ key: "value" }),
   headers: {
-    "Content-Type": "application/json"
-  }
+    "Content-Type": "application/json",
+  },
 });
 ```
 

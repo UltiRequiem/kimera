@@ -1,44 +1,75 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/UltiRequiem/kimera/core"
 	"github.com/spf13/cobra"
 )
 
-func Execute() *cobra.Command {
-	var rootCmd = &cobra.Command{
-		Use:   "Runs the REPL.",
-		Short: "",
-		Run: func(cmd *cobra.Command, args []string) {
-			core.Repl()
+func NewRootCommand() *cobra.Command {
+	rootCmd := &cobra.Command{
+		Use:   "kimera",
+		Short: "A JavaScript runtime powered by QuickJS",
+		Long:  "Kimera is a modern JavaScript/TypeScript runtime that provides a REPL and file execution capabilities.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return core.Repl()
 		},
+		SilenceUsage: true,
 	}
 
-	var versionCmd = &cobra.Command{
+	rootCmd.AddCommand(newVersionCommand())
+	rootCmd.AddCommand(newRunCommand())
+
+	return rootCmd
+}
+
+func newVersionCommand() *cobra.Command {
+	return &cobra.Command{
 		Use:   "version",
-		Short: "Print the version.",
+		Short: "Print the version information",
+		Long:  "Display the current version of Kimera.",
 		Run: func(cmd *cobra.Command, args []string) {
 			core.PrintVersion()
 		},
 	}
+}
 
-	var fsFlag bool
-	var netFlag bool
-	var envFlag bool
+func newRunCommand() *cobra.Command {
+	opts := &core.RunOptions{}
 
-	var runCmd = &cobra.Command{
+	runCmd := &cobra.Command{
 		Use:   "run [file]",
-		Short: "Run a JavaScript file.",
+		Short: "Run a JavaScript or TypeScript file",
+		Long:  "Execute a JavaScript or TypeScript file with optional permission flags for filesystem, network, and environment variable access.",
 		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			core.RunFile(args[0])
+		RunE: func(cmd *cobra.Command, args []string) error {
+			opts.FilePath = args[0]
+
+			if err := core.RunFile(*opts); err != nil {
+				return fmt.Errorf("failed to run file: %w", err)
+			}
+
+			return nil
 		},
+		SilenceUsage: true,
 	}
-	runCmd.Flags().BoolVar(&fsFlag, "fs", false, "Allow file system access")
-	runCmd.Flags().BoolVar(&netFlag, "net", false, "Allow net access")
-	runCmd.Flags().BoolVar(&envFlag, "env", false, "Allow Environment Variables access")
 
-	rootCmd.AddCommand(runCmd, versionCmd)
+	runCmd.Flags().BoolVar(&opts.AllowFS, "fs", false, "Allow filesystem access")
+	runCmd.Flags().BoolVar(&opts.AllowNet, "net", false, "Allow network access")
+	runCmd.Flags().BoolVar(&opts.AllowEnv, "env", false, "Allow environment variable access")
 
-	return rootCmd
+	return runCmd
+}
+
+func Execute() error {
+	rootCmd := NewRootCommand()
+
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	return nil
 }

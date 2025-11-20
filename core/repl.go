@@ -3,51 +3,82 @@ package core
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
+	"strings"
 
 	"github.com/lithdew/quickjs"
 )
 
-func Repl() {
-	fmt.Printf("Kimera %s", VERSION)
-	fmt.Println("exit using ctrl+c or close()")
+func Repl() error {
+	fmt.Printf("Kimera %s\n", VERSION)
+	fmt.Println("Exit using Ctrl+C or Ctrl+D")
+	fmt.Println()
 
-	for true {
+	jsRuntime := quickjs.NewRuntime()
+	defer jsRuntime.Free()
+
+	ctx := jsRuntime.NewContext()
+	defer ctx.Free()
+
+	// Inject globals
+	globals := ctx.Globals()
+	globals.Set("__dispatch", ctx.Function(Globals))
+
+	globalsResult, err := ctx.Eval(codeGlobals)
+	if err != nil {
+		return fmt.Errorf("failed to inject globals: %w", err)
+	}
+	globalsResult.Free()
+
+	reader := bufio.NewReader(os.Stdin)
+	buffer := ""
+
+	for{
 		fmt.Print("> ")
 
-		reader := bufio.NewReader(os.Stdin)
-		text, _ := reader.ReadString('\n')
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			if err == io.EOF {
+				fmt.Println("\nGoodbye!")
+				return nil
+			}
+			return fmt.Errorf("failed to read input: %w", err)
+		}
 
-		stringToEval := ""
-		fmt.Println(Eval(text, &stringToEval))
-		stringToEval += ";undefined;"
+		line = strings.TrimSpace(line)
+
+		if line == "" {
+			continue
+		}
+
+		output, evalErr := evalLine(ctx, line, &buffer)
+		if evalErr != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", evalErr)
+			buffer = "" // Reset buffer on error
+			continue
+		}
+
+		if output != "" && output != "undefined" {
+			fmt.Println(output)
+		}
 	}
 }
 
-func Eval(text string, buffer *string) string {
-	runtime := quickjs.NewRuntime()
-	defer runtime.Free()
+func evalLine(ctx *quickjs.Context, line string, buffer *string) (string, error) {
+	fullCode := *buffer + line
 
-	ctx := runtime.NewContext()
-	defer ctx.Free()
-
-	globalsEval := ctx.Globals()
-	globalsEval.Set("__dispatch", ctx.Function(Globals))
-
-	k, errorInjectingGlobals := ctx.Eval(codeGlobals)
-	CheckJSError(errorInjectingGlobals, false)
-	defer k.Free()
-
-	result, err := ctx.Eval(*buffer + text)
-
+	result, err := ctx.Eval(fullCode)
 	if err != nil {
-		CheckJSError(err, false)
-		return result.String()
+		if *buffer != "" {
+			*buffer += line + "\n"
+			return "", fmt.Errorf("syntax error (use empty line to reset): %w", err)
+		}
+		return "", err
 	}
+	defer result.Free()
 
-	*buffer += fmt.Sprintf(";undefined; %s", text)
+	*buffer = ""
 
-	result.Free()
-
-	return result.String()
+	return result.String(), nil
 }

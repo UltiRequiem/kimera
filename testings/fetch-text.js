@@ -5,10 +5,10 @@
 // console.log("Content: " + text);
 
 try {
-  const response = fetch("http://localhost:8080/get");
+  const response = fetch("https://joke.deno.dev/");
   console.log("Status: " + response.status);
   console.log("OK: " + response.ok);
-  
+
   const text = response.text();
   console.log("Response length: " + text.length);
   console.log("Text content: " + text);

@@ -8,21 +8,21 @@
 // console.log("Status: " + response.status);
 
 try {
-  const response = fetch("http://localhost:8080/post", {
+  const response = fetch("https://joke.deno.dev/", {
     method: "POST",
     body: JSON.stringify({
       title: "Test Post from Kimera",
       body: "This is a test post",
-      userId: 1
+      userId: 1,
     }),
     headers: {
-      "Content-Type": "application/json"
-    }
+      "Content-Type": "application/json",
+    },
   });
-  
+
   console.log("Status: " + response.status);
   console.log("OK: " + response.ok);
-  
+
   const data = response.json();
   console.log("Server message: " + data.message);
   console.log("POST request successful!");

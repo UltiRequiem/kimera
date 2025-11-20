@@ -1,6 +1,7 @@
 # Kimera.js API Documentation
 
-This document provides comprehensive documentation of all APIs available in Kimera.js.
+This document provides comprehensive documentation of all APIs available in
+Kimera.js.
 
 ## Command Line Interface
 
@@ -13,12 +14,14 @@ kimera
 ```
 
 **Behavior:**
+
 - Starts an interactive JavaScript console
 - Displays version information on startup
 - Evaluates JavaScript expressions in real-time
 - Exit with `ctrl+c` or by calling `close()`
 
 **Example:**
+
 ```sh
 $ kimera
 Kimera 0.1.0
@@ -41,14 +44,17 @@ kimera run <file>
 ```
 
 **Arguments:**
+
 - `file` - Path to the JavaScript (.js) or TypeScript (.ts) file to execute
 
 **Flags:**
+
 - `--fs` - Allow file system access (reserved for future use)
 - `--net` - Allow network access (reserved for future use)
 - `--env` - Allow environment variable access (reserved for future use)
 
 **Example:**
+
 ```sh
 kimera run script.js
 kimera run app.ts
@@ -63,6 +69,7 @@ kimera version
 ```
 
 **Output:**
+
 ```
 Kimera 0.1.0
 ```
@@ -76,9 +83,11 @@ Kimera 0.1.0
 Prints messages to standard output.
 
 **Parameters:**
+
 - `...args` - Any number of arguments to print
 
 **Example:**
+
 ```javascript
 console.log("Hello");
 console.log("Multiple", "arguments");
@@ -95,15 +104,19 @@ The `Kimera` object provides file system operations.
 Reads the entire contents of a file as a string.
 
 **Parameters:**
+
 - `filePath` (string) - Path to the file to read
 
 **Returns:**
+
 - (string) - The file contents as a string
 
 **Throws:**
+
 - Error if file doesn't exist or cannot be read
 
 **Example:**
+
 ```javascript
 // Read a text file
 const content = Kimera.readFile("./data.txt");
@@ -120,19 +133,24 @@ try {
 
 #### `Kimera.writeFile(filePath, content)`
 
-Writes content to a file, creating it if it doesn't exist or overwriting if it does.
+Writes content to a file, creating it if it doesn't exist or overwriting if it
+does.
 
 **Parameters:**
+
 - `filePath` (string) - Path to the file to write
 - `content` (string) - Content to write to the file
 
 **Returns:**
+
 - null
 
 **Throws:**
+
 - Error if file cannot be written
 
 **Example:**
+
 ```javascript
 // Write simple text
 Kimera.writeFile("output.txt", "Hello World!");
@@ -159,6 +177,7 @@ try {
 Exits the Kimera runtime immediately.
 
 **Example:**
+
 ```javascript
 console.log("Before exit");
 close();
@@ -168,6 +187,7 @@ console.log("This won't print");
 ### Global Objects
 
 Kimera provides the following global objects:
+
 - `console` - Console logging API
 - `Kimera` - File system and runtime API
 - `close()` - Function to exit the runtime
@@ -194,7 +214,7 @@ Kimera.js supports modern JavaScript (ES6+) including:
   const asyncFunc = async () => {
     return "result";
   };
-  
+
   asyncFunc().then(console.log);
   ```
 
@@ -235,7 +255,7 @@ interface User {
 
 const user: User = {
   name: "Alice",
-  age: 30
+  age: 30,
 };
 
 // Generics
@@ -244,7 +264,8 @@ function identity<T>(arg: T): T {
 }
 ```
 
-**Note:** TypeScript is transpiled to JavaScript using esbuild, so type checking happens at transpilation time, not runtime.
+**Note:** TypeScript is transpiled to JavaScript using esbuild, so type checking
+happens at transpilation time, not runtime.
 
 ## Error Handling
 
@@ -266,7 +287,8 @@ try {
 
 ## Best Practices
 
-1. **Always handle file errors**: Use try-catch blocks when reading or writing files
+1. **Always handle file errors**: Use try-catch blocks when reading or writing
+   files
    ```javascript
    try {
      const data = Kimera.readFile(filename);
@@ -280,11 +302,12 @@ try {
    const main = async () => {
      // Your async code here
    };
-   
+
    main();
    ```
 
-3. **Leverage TypeScript for type safety**: Use .ts files for better development experience
+3. **Leverage TypeScript for type safety**: Use .ts files for better development
+   experience
    ```typescript
    interface Config {
      port: number;
@@ -321,7 +344,7 @@ console.log(`File has ${lines.length} lines`);
 const logMessage = (message) => {
   const timestamp = new Date().toISOString();
   const logEntry = `[${timestamp}] ${message}\n`;
-  
+
   try {
     // Append to log (read existing, append, write back)
     let existingLog = "";
@@ -351,7 +374,7 @@ interface FileData {
 const analyzeFile = (path: string): FileData => {
   const content: string = Kimera.readFile(path);
   const lines: number = content.split("\n").length;
-  
+
   return { content, lines };
 };
 

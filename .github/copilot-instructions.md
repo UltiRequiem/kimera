@@ -2,7 +2,9 @@
 
 ## Project Overview
 
-Kimera.js is a minimal JavaScript/TypeScript runtime written in Go. It is built on top of QuickJS and esbuild, providing a lightweight alternative to Node.js and Deno.
+Kimera.js is a minimal JavaScript/TypeScript runtime written in Go. It is built
+on top of QuickJS and esbuild, providing a lightweight alternative to Node.js
+and Deno.
 
 ## Tech Stack
 
@@ -47,7 +49,8 @@ go build
 
 ### Run Tests
 
-The project uses a custom test runner that executes JavaScript/TypeScript files in the `/testings` directory:
+The project uses a custom test runner that executes JavaScript/TypeScript files
+in the `/testings` directory:
 
 ```bash
 ./kimera run testings/<test-file>.js
@@ -59,7 +62,8 @@ The project uses a custom test runner that executes JavaScript/TypeScript files 
 go test ./...
 ```
 
-Note: Currently, there are no Go unit tests. If adding Go tests, place them alongside the code they test with `_test.go` suffix.
+Note: Currently, there are no Go unit tests. If adding Go tests, place them
+alongside the code they test with `_test.go` suffix.
 
 ## Features to Implement Carefully
 
@@ -73,6 +77,7 @@ Note: Currently, there are no Go unit tests. If adding Go tests, place them alon
 ### Global APIs
 
 The runtime provides custom global APIs through the `Kimera` namespace:
+
 - File operations: `Kimera.readFile()`, `Kimera.writeFile()`
 - These are injected via the `__dispatch` function
 
@@ -80,7 +85,8 @@ The runtime provides custom global APIs through the `Kimera` namespace:
 
 - Keep permissions opt-in (fs, net, env flags)
 - Validate user input in CLI commands
-- Be careful with QuickJS memory management - always Free() contexts and runtimes
+- Be careful with QuickJS memory management - always Free() contexts and
+  runtimes
 - Don't expose system internals through JavaScript APIs
 
 ## CI/CD
