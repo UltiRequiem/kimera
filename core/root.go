@@ -10,7 +10,7 @@ import (
 	"github.com/lithdew/quickjs"
 )
 
-//go:embed std/*
+//go:embed std/root.js
 var codeGlobals string
 
 func RunFile(fileToRun string) {
