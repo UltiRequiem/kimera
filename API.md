@@ -18,14 +18,16 @@ kimera
 - Starts an interactive JavaScript console
 - Displays version information on startup
 - Evaluates JavaScript expressions in real-time
-- Exit with `ctrl+c` or by calling `close()`
+- Maintains a single QuickJS runtime for the entire session (efficient)
+- Exit with `Ctrl+C`, `Ctrl+D`, or by calling `close()`
 
 **Example:**
 
 ```sh
 $ kimera
-Kimera 0.1.0
-exit using ctrl+c or close()
+Kimera 0.2.0
+Exit using Ctrl+C or Ctrl+D
+
 > const x = 10
 undefined
 > x * 2
@@ -33,6 +35,10 @@ undefined
 > console.log("Hello!")
 Hello!
 undefined
+> const add = (a, b) => a + b
+undefined
+> add(5, 3)
+8
 ```
 
 ### `kimera run [file]`
@@ -40,24 +46,46 @@ undefined
 Execute a JavaScript or TypeScript file.
 
 ```sh
-kimera run <file>
+kimera run <file> [flags]
 ```
 
 **Arguments:**
 
-- `file` - Path to the JavaScript (.js) or TypeScript (.ts) file to execute
+- `file` (required) - Path to the JavaScript (.js) or TypeScript (.ts) file to
+  execute
 
 **Flags:**
 
-- `--fs` - Allow file system access (reserved for future use)
-- `--net` - Allow network access (reserved for future use)
-- `--env` - Allow environment variable access (reserved for future use)
+- `--fs` - Allow filesystem access (reserved for future implementation)
+- `--net` - Allow network access (reserved for future implementation)
+- `--env` - Allow environment variable access (reserved for future
+  implementation)
 
-**Example:**
+**Examples:**
 
 ```sh
+# Run a JavaScript file
 kimera run script.js
+
+# Run a TypeScript file with type annotations
 kimera run app.ts
+
+# Run with permission flags (planned feature)
+kimera run script.js --fs --net
+```
+
+**Error Handling:**
+
+The command returns proper exit codes:
+
+- `0` - Success
+- `1` - Error (file not found, syntax error, runtime error)
+
+Error messages are formatted with context:
+
+```sh
+$ kimera run missing.js
+Error: failed to run file: failed to read file "missing.js": open missing.js: no such file or directory
 ```
 
 ### `kimera version`
@@ -71,7 +99,36 @@ kimera version
 **Output:**
 
 ```
-Kimera 0.1.0
+Kimera 0.2.0
+```
+
+### `kimera help` / `kimera --help`
+
+Display help information about available commands.
+
+```sh
+kimera --help
+```
+
+**Output:**
+
+```
+Kimera is a modern JavaScript/TypeScript runtime that provides a REPL
+and file execution capabilities.
+
+Usage:
+  kimera [flags]
+  kimera [command]
+
+Available Commands:
+  help        Help about any command
+  run         Run a JavaScript or TypeScript file
+  version     Print the version information
+
+Flags:
+  -h, --help   help for kimera
+
+Use "kimera [command] --help" for more information about a command.
 ```
 
 ## JavaScript/TypeScript APIs
@@ -315,17 +372,49 @@ try {
    }
    ```
 
+## Architecture & Implementation Details
+
+### Error Handling
+
+Kimera uses Go's idiomatic error handling patterns:
+
+- All errors are properly wrapped with context using `fmt.Errorf` with `%w`
+- Error chains can be inspected using `errors.Is` and `errors.As`
+- Clear error messages indicate the operation that failed and why
+
+Example error flow:
+
+```
+Error: failed to run file: failed to read file "script.js": open script.js: no such file or directory
+       [cmd layer]          [core layer]           [os layer]
+```
+
+### Resource Management
+
+- QuickJS runtimes and contexts are properly freed using `defer`
+- REPL maintains a single runtime for the entire session (performance
+  optimization)
+- Each `kimera run` command creates a fresh runtime (isolation)
+
+### TypeScript Transpilation
+
+- TypeScript files are transpiled to JavaScript using esbuild
+- Transpilation happens at runtime before execution
+- No separate build step required
+- Type checking occurs during transpilation
+
 ## Limitations
 
 Current limitations of Kimera.js:
 
-- No built-in network/HTTP APIs
-- No environment variable access (planned)
-- No module system (import/export) yet
-- Limited Node.js API compatibility
-- No npm package support
-- Single-threaded execution
-- No DOM APIs (this is not a browser runtime)
+- **No module system**: import/export statements not yet supported
+- **No npm packages**: Cannot install or use npm packages
+- **Limited Node.js compatibility**: Only a subset of APIs available
+- **Single-threaded**: No worker threads or parallel execution
+- **No DOM APIs**: This is not a browser runtime
+- **Permission system incomplete**: --fs, --net, --env flags are defined but not
+  enforced yet
+- **HTTP/Fetch API**: Currently experimental with limited functionality
 
 ## Examples
 
