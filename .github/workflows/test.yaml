@@ -21,18 +21,55 @@ jobs:
         run: |
           echo "Running test suite..."
           test_failed=0
-          for file in testings/*.js testings/*.ts; do
-            if [ -f "$file" ]; then
-              echo "=== Running $file ==="
-              if ./kimera run "$file"; then
-                echo "✓ $file passed"
-              else
-                echo "✗ $file failed"
-                test_failed=1
-              fi
-              echo ""
+          
+          # Helper function to run a test with specific flags
+          run_test() {
+            local file=$1
+            shift
+            local flags="$@"
+            echo "=== Running $file $flags ==="
+            if ./kimera run "$file" $flags; then
+              echo "✓ $file passed"
+            else
+              echo "✗ $file failed"
+              test_failed=1
             fi
-          done
+            echo ""
+          }
+          
+          # Tests that need filesystem access (--fs)
+          run_test "testings/file-comprehensive.js" --fs
+          run_test "testings/file-error.js" --fs
+          run_test "testings/file-read.js" --fs
+          run_test "testings/file-simple.js" --fs
+          run_test "testings/file-write.js" --fs
+          run_test "testings/file-typescript.ts" --fs
+          
+          # Tests that need network access (--net)
+          run_test "testings/fetch-get.js" --net
+          run_test "testings/fetch-post.js" --net
+          run_test "testings/fetch-text.js" --net
+          
+          # Tests that need environment access (--env)
+          run_test "testings/permission-env-allowed.js" --env
+          
+          # Tests that need filesystem + environment access (--fs --env)
+          run_test "testings/permission-combined.js" --fs --env
+          run_test "testings/permission-demo.js" --fs --env
+          
+          # Tests that need filesystem access (permission tests)
+          run_test "testings/permission-fs-allowed.js" --fs
+          
+          # Tests that don't need any permissions (or test denial)
+          run_test "testings/async.ts"
+          run_test "testings/fetch-example.js"
+          run_test "testings/functions.js"
+          run_test "testings/globals.js"
+          run_test "testings/permission-env-denied.js"
+          run_test "testings/permission-fs-denied.js"
+          run_test "testings/permission-net-denied.js"
+          run_test "testings/permission-write-denied.js"
+          
           if [ $test_failed -eq 1 ]; then
             echo "Some tests failed!"
             exit 1
