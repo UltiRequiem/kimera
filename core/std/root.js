@@ -24,6 +24,13 @@ function fetch(url, options = {}) {
   };
 }
 
+// Initialize server handlers registry
+if (!globalThis.__serverHandlers) {
+  globalThis.__serverHandlers = {};
+}
+
+let __handlerCounter = 0;
+
 const Kimera = {
   readFile(filePath) {
     return globalThis.__dispatch("readFile", filePath);
@@ -36,6 +43,27 @@ const Kimera = {
   },
   setEnv(varName, value) {
     return globalThis.__dispatch("setEnv", varName, value);
+  },
+  createServer(handler) {
+    // Generate unique handler ID
+    const handlerID = `handler_${__handlerCounter++}`;
+    
+    // Store the handler function
+    globalThis.__serverHandlers[handlerID] = handler;
+    
+    // Create server ID through dispatch
+    const serverID = globalThis.__dispatch("httpCreateServer", handlerID);
+    
+    return {
+      listen(port) {
+        return globalThis.__dispatch("httpServerListen", serverID, String(port), handlerID);
+      },
+      close() {
+        // Clean up handler when server closes
+        delete globalThis.__serverHandlers[handlerID];
+        return globalThis.__dispatch("httpServerClose", serverID);
+      },
+    };
   },
 };
 
