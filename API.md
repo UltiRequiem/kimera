@@ -56,22 +56,24 @@ kimera run <file> [flags]
 
 **Flags:**
 
-- `--fs` - Allow filesystem access (reserved for future implementation)
-- `--net` - Allow network access (reserved for future implementation)
-- `--env` - Allow environment variable access (reserved for future
-  implementation)
+- `--fs` - Allow filesystem access (required for `Kimera.readFile()` and `Kimera.writeFile()`)
+- `--net` - Allow network access (required for `fetch()`)
+- `--env` - Allow environment variable access (required for `Kimera.getEnv()` and `Kimera.setEnv()`)
 
 **Examples:**
 
 ```sh
-# Run a JavaScript file
+# Run a JavaScript file (no permissions)
 kimera run script.js
 
 # Run a TypeScript file with type annotations
 kimera run app.ts
 
-# Run with permission flags (planned feature)
-kimera run script.js --fs --net
+# Run with permission flags
+kimera run script.js --fs              # Filesystem only
+kimera run script.js --net             # Network only
+kimera run script.js --env             # Environment variables only
+kimera run script.js --fs --net --env  # All permissions
 ```
 
 **Error Handling:**
@@ -227,6 +229,99 @@ try {
 }
 ```
 
+**Note:** File system operations require the `--fs` flag:
+
+```sh
+kimera run script.js --fs
+```
+
+### Kimera Environment Variables API
+
+The `Kimera` object provides environment variable operations.
+
+#### `Kimera.getEnv(varName)`
+
+Reads the value of an environment variable.
+
+**Parameters:**
+
+- `varName` (string) - Name of the environment variable to read
+
+**Returns:**
+
+- (string) - The value of the environment variable, or an empty string if not set
+
+**Throws:**
+
+- Error if environment variable access is not allowed (requires `--env` flag)
+
+**Example:**
+
+```javascript
+// Read an environment variable
+const path = Kimera.getEnv("PATH");
+console.log("PATH:", path);
+
+// Check if a variable exists
+const myVar = Kimera.getEnv("MY_VAR");
+if (myVar) {
+  console.log("MY_VAR is set to:", myVar);
+} else {
+  console.log("MY_VAR is not set");
+}
+
+// With error handling
+try {
+  const home = Kimera.getEnv("HOME");
+  console.log("Home directory:", home);
+} catch (error) {
+  console.log("Environment access denied");
+}
+```
+
+#### `Kimera.setEnv(varName, value)`
+
+Sets the value of an environment variable in the current process.
+
+**Parameters:**
+
+- `varName` (string) - Name of the environment variable to set
+- `value` (string) - Value to set the environment variable to
+
+**Returns:**
+
+- null
+
+**Throws:**
+
+- Error if environment variable access is not allowed (requires `--env` flag)
+- Error if the operation fails
+
+**Example:**
+
+```javascript
+// Set an environment variable
+Kimera.setEnv("MY_VAR", "my_value");
+
+// Verify it was set
+const value = Kimera.getEnv("MY_VAR");
+console.log(value); // "my_value"
+
+// Set with error handling
+try {
+  Kimera.setEnv("CONFIG_PATH", "/etc/config");
+  console.log("Environment variable set successfully");
+} catch (error) {
+  console.log("Failed to set environment variable");
+}
+```
+
+**Note:** Environment variable operations require the `--env` flag:
+
+```sh
+kimera run script.js --env
+```
+
 ### Global Functions
 
 #### `close()`
@@ -246,7 +341,7 @@ console.log("This won't print");
 Kimera provides the following global objects:
 
 - `console` - Console logging API
-- `Kimera` - File system and runtime API
+- `Kimera` - File system, environment variables, and runtime API
 - `close()` - Function to exit the runtime
 
 ## Language Support
@@ -412,8 +507,6 @@ Current limitations of Kimera.js:
 - **Limited Node.js compatibility**: Only a subset of APIs available
 - **Single-threaded**: No worker threads or parallel execution
 - **No DOM APIs**: This is not a browser runtime
-- **Permission system incomplete**: --fs, --net, --env flags are defined but not
-  enforced yet
 - **HTTP/Fetch API**: Currently experimental with limited functionality
 
 ## Examples
@@ -425,6 +518,12 @@ Current limitations of Kimera.js:
 const content = Kimera.readFile("data.txt");
 const lines = content.split("\n");
 console.log(`File has ${lines.length} lines`);
+```
+
+**Run with:**
+
+```sh
+kimera run script.js --fs
 ```
 
 ### Creating a Log File
@@ -452,6 +551,12 @@ logMessage("Application started");
 logMessage("Processing data");
 ```
 
+**Run with:**
+
+```sh
+kimera run script.js --fs
+```
+
 ### TypeScript with File Operations
 
 ```typescript
@@ -469,4 +574,10 @@ const analyzeFile = (path: string): FileData => {
 
 const result = analyzeFile("data.txt");
 console.log(`Lines: ${result.lines}`);
+```
+
+**Run with:**
+
+```sh
+kimera run script.ts --fs
 ```

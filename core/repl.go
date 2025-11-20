@@ -22,8 +22,14 @@ func Repl() error {
 	defer ctx.Free()
 
 	// Inject globals
+	// In REPL mode, allow all permissions by default
+	permissions := PermissionContext{
+		AllowFS:  true,
+		AllowNet: true,
+		AllowEnv: true,
+	}
 	globals := ctx.Globals()
-	globals.Set("__dispatch", ctx.Function(Globals))
+	globals.Set("__dispatch", ctx.Function(MakeGlobals(permissions)))
 
 	globalsResult, err := ctx.Eval(codeGlobals)
 	if err != nil {
