@@ -56,12 +56,17 @@ kimera run myScript.js
 kimera run myScript.ts
 ```
 
-**Permission Flags** (planned for future use):
+**Permission Flags**:
+
+Kimera implements a secure-by-default permission system. Scripts must explicitly request access to sensitive operations:
 
 ```sh
 kimera run script.js --fs    # Allow filesystem access
 kimera run script.js --net   # Allow network access
 kimera run script.js --env   # Allow environment variable access
+
+# Multiple flags can be combined
+kimera run script.js --fs --net --env
 ```
 
 ### 3. TypeScript Support
@@ -143,15 +148,64 @@ try {
 }
 ```
 
-### 7. Global Objects
+### 7. Environment Variables API
+
+Access and modify environment variables through the `Kimera` global object (requires `--env` flag):
+
+#### Reading Environment Variables
+
+```javascript
+// Get an environment variable
+const path = Kimera.getEnv("PATH");
+console.log("PATH:", path);
+
+// Check if a variable exists
+const myVar = Kimera.getEnv("MY_VAR");
+if (myVar) {
+  console.log("MY_VAR is set to:", myVar);
+} else {
+  console.log("MY_VAR is not set");
+}
+```
+
+#### Setting Environment Variables
+
+```javascript
+// Set an environment variable
+Kimera.setEnv("MY_VAR", "my_value");
+
+// Verify it was set
+const value = Kimera.getEnv("MY_VAR");
+console.log(value); // "my_value"
+```
+
+#### Error Handling
+
+Environment operations throw errors when permission is not granted:
+
+```javascript
+try {
+  const value = Kimera.getEnv("PATH");
+} catch (error) {
+  console.log("Environment access denied!");
+}
+```
+
+**Note:** Environment variable operations require the `--env` flag:
+
+```sh
+kimera run script.js --env
+```
+
+### 8. Global Objects
 
 Kimera provides the following global objects:
 
 - `console` - Console logging API
-- `Kimera` - File system and runtime API
+- `Kimera` - File system, environment variables, and runtime API
 - `close()` - Function to exit the runtime
 
-### 8. Version Information
+### 9. Version Information
 
 Check the installed Kimera version:
 
@@ -159,9 +213,9 @@ Check the installed Kimera version:
 kimera version
 ```
 
-### 9. HTTP/Fetch API (Experimental)
+### 10. HTTP/Fetch API (Experimental)
 
-Make HTTP requests with the fetch API:
+Make HTTP requests with the fetch API (requires `--net` flag):
 
 ```javascript
 // Make a GET request
@@ -179,10 +233,16 @@ const postResponse = fetch("https://api.example.com/data", {
 });
 ```
 
+**Note:** Network operations require the `--net` flag:
+
+```sh
+kimera run script.js --net
+```
+
 ## CLI Usage
 
 ```sh
-# Run the REPL
+# Run the REPL (all permissions enabled)
 kimera
 
 # Run a JavaScript file
@@ -190,6 +250,12 @@ kimera run script.js
 
 # Run a TypeScript file
 kimera run script.ts
+
+# Run with specific permissions
+kimera run script.js --fs           # Filesystem access
+kimera run script.js --net          # Network access
+kimera run script.js --env          # Environment variables
+kimera run script.js --fs --net     # Multiple permissions
 
 # Check version
 kimera version
@@ -221,7 +287,7 @@ go test ./...
 - [ ] More Node.js API compatibility
 - [ ] Better error messages
 - [ ] Debugger support
-- [ ] Permission system implementation (--fs, --net, --env flags)
+- [x] Permission system implementation (--fs, --net, --env flags)
 
 ## Contributing
 
