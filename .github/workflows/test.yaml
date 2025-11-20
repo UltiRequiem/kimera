@@ -37,38 +37,28 @@ jobs:
             echo ""
           }
           
-          # Tests that need filesystem access (--fs)
-          run_test "testings/file-comprehensive.js" --fs
-          run_test "testings/file-error.js" --fs
-          run_test "testings/file-read.js" --fs
-          run_test "testings/file-simple.js" --fs
-          run_test "testings/file-write.js" --fs
-          run_test "testings/file-typescript.ts" --fs
+          # Helper function to run all tests in a directory with specific flags
+          run_directory_tests() {
+            local dir=$1
+            shift
+            local flags="$@"
+            
+            if [ -d "$dir" ]; then
+              echo "Running tests in $dir with flags: $flags"
+              for test_file in "$dir"/*.js "$dir"/*.ts; do
+                if [ -f "$test_file" ]; then
+                  run_test "$test_file" $flags
+                fi
+              done
+            fi
+          }
           
-          # Tests that need network access (--net)
-          run_test "testings/fetch-get.js" --net
-          run_test "testings/fetch-post.js" --net
-          run_test "testings/fetch-text.js" --net
-          
-          # Tests that need environment access (--env)
-          run_test "testings/permission-env-allowed.js" --env
-          
-          # Tests that need filesystem + environment access (--fs --env)
-          run_test "testings/permission-combined.js" --fs --env
-          run_test "testings/permission-demo.js" --fs --env
-          
-          # Tests that need filesystem access (permission tests)
-          run_test "testings/permission-fs-allowed.js" --fs
-          
-          # Tests that don't need any permissions (or test denial)
-          run_test "testings/async.ts"
-          run_test "testings/fetch-example.js"
-          run_test "testings/functions.js"
-          run_test "testings/globals.js"
-          run_test "testings/permission-env-denied.js"
-          run_test "testings/permission-fs-denied.js"
-          run_test "testings/permission-net-denied.js"
-          run_test "testings/permission-write-denied.js"
+          # Run tests by directory with appropriate permissions
+          run_directory_tests "testings/fs" --fs
+          run_directory_tests "testings/net" --net
+          run_directory_tests "testings/env" --env
+          run_directory_tests "testings/combined" --fs --env
+          run_directory_tests "testings/basic"
           
           if [ $test_failed -eq 1 ]; then
             echo "Some tests failed!"

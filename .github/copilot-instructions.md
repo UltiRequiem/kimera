@@ -34,10 +34,17 @@ and Deno.
 
 ### JavaScript/TypeScript Tests
 
-- Place test files in the `/testings` directory
+- **ALWAYS add tests for new features** - Never add a new feature without corresponding tests
+- Place test files in the appropriate `/testings` subdirectory based on required permissions:
+  - `/testings/fs/` - Tests requiring filesystem access (`--fs` flag)
+  - `/testings/net/` - Tests requiring network access (`--net` flag)
+  - `/testings/env/` - Tests requiring environment variable access (`--env` flag)
+  - `/testings/combined/` - Tests requiring multiple permissions (e.g., `--fs --env`)
+  - `/testings/basic/` - Tests not requiring any permissions
 - Use `.js` or `.ts` extensions
 - Tests should be executable scripts that exit with status 0 on success
-- Use descriptive filenames (e.g., `file-read.js`, `async.ts`)
+- Use descriptive filenames (e.g., `file-read.js`, `fetch-headers.js`, `permission-fs-denied.js`)
+- CI automatically runs tests with appropriate flags based on directory structure
 
 ## Building and Testing
 
@@ -47,13 +54,28 @@ and Deno.
 go build
 ```
 
+### Test Directory Structure
+
+Tests are organized by required permissions in `/testings/`:
+- `fs/` - Filesystem tests (run with `--fs`)
+- `net/` - Network tests (run with `--net`)
+- `env/` - Environment tests (run with `--env`)
+- `combined/` - Multi-permission tests (run with `--fs --env`, etc.)
+- `basic/` - No permission tests
+
+The CI automatically discovers and runs tests with appropriate flags based on directory.
+See `/testings/README.md` for details.
+
 ### Run Tests
 
-The project uses a custom test runner that executes JavaScript/TypeScript files
-in the `/testings` directory:
+To run a specific test manually:
 
 ```bash
-./kimera run testings/<test-file>.js
+./kimera run testings/fs/<test-file>.js --fs
+./kimera run testings/net/<test-file>.js --net
+./kimera run testings/env/<test-file>.js --env
+./kimera run testings/combined/<test-file>.js --fs --env
+./kimera run testings/basic/<test-file>.js
 ```
 
 ### Testing with Go
@@ -126,10 +148,16 @@ rootCmd.AddCommand(newCmd)
 
 ## Documentation
 
+- **ALWAYS check and update documentation** when making changes:
+  - Review README.md for accuracy and completeness
+  - Check API.md if adding or modifying JavaScript APIs
+  - Update relevant sections even for small changes
+  - Ensure examples are current and working
 - Keep README.md up to date with new features
 - Document CLI flags and commands
 - Provide examples for new JavaScript APIs
 - Use clear, concise language
+- When fixing bugs or adding features, verify related documentation is still accurate
 
 ## Error Handling
 
