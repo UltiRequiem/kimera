@@ -177,16 +177,6 @@ globalThis.myGlobal = "value";
 console.log(globalThis.myGlobal); // "value"
 ```
 
-#### `window`
-
-Alias for `globalThis`, provided for browser API compatibility.
-
-**Example:**
-```javascript
-window.console.log("Hello"); // Same as console.log
-console.log(this === globalThis); // true in REPL
-```
-
 ## Language Support
 
 ### JavaScript

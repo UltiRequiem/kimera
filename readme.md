@@ -127,7 +127,6 @@ try {
 
 Kimera provides standard global objects:
 - `globalThis` - Standard global object
-- `window` - Alias for globalThis (browser compatibility)
 - `console` - Console logging API
 - `Kimera` - File system and runtime API
 - `close()` - Function to exit the runtime
