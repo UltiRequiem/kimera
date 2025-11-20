@@ -125,8 +125,7 @@ try {
 
 ### 7. Global Objects
 
-Kimera provides standard global objects:
-- `globalThis` - Standard global object
+Kimera provides the following global objects:
 - `console` - Console logging API
 - `Kimera` - File system and runtime API
 - `close()` - Function to exit the runtime

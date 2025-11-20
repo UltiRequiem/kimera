@@ -167,15 +167,10 @@ console.log("This won't print");
 
 ### Global Objects
 
-#### `globalThis`
-
-The global object, providing access to global properties and functions.
-
-**Example:**
-```javascript
-globalThis.myGlobal = "value";
-console.log(globalThis.myGlobal); // "value"
-```
+Kimera provides the following global objects:
+- `console` - Console logging API
+- `Kimera` - File system and runtime API
+- `close()` - Function to exit the runtime
 
 ## Language Support
 
