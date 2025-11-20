@@ -31,6 +31,12 @@ const Kimera = {
   writeFile(filePath, content) {
     return globalThis.__dispatch("writeFile", filePath, content);
   },
+  getEnv(varName) {
+    return globalThis.__dispatch("getEnv", varName);
+  },
+  setEnv(varName, value) {
+    return globalThis.__dispatch("setEnv", varName, value);
+  },
 };
 
 globalThis = {

@@ -12,7 +12,19 @@ import (
 	"github.com/lithdew/quickjs"
 )
 
-func Globals(ctx *quickjs.Context, this quickjs.Value, args []quickjs.Value) quickjs.Value {
+type PermissionContext struct {
+	AllowFS  bool
+	AllowNet bool
+	AllowEnv bool
+}
+
+func MakeGlobals(permissions PermissionContext) func(*quickjs.Context, quickjs.Value, []quickjs.Value) quickjs.Value {
+	return func(ctx *quickjs.Context, this quickjs.Value, args []quickjs.Value) quickjs.Value {
+		return Globals(ctx, this, args, permissions)
+	}
+}
+
+func Globals(ctx *quickjs.Context, this quickjs.Value, args []quickjs.Value, permissions PermissionContext) quickjs.Value {
 
 	switch args[0].String() {
 
@@ -21,6 +33,9 @@ func Globals(ctx *quickjs.Context, this quickjs.Value, args []quickjs.Value) qui
 	case "close":
 		os.Exit(1)
 	case "readFile":
+		if !permissions.AllowFS {
+			return ctx.ThrowError(fmt.Errorf("filesystem access denied. Use --fs flag to allow"))
+		}
 		if len(args) < 2 {
 			return ctx.ThrowTypeError("readFile requires a file path")
 		}
@@ -31,6 +46,9 @@ func Globals(ctx *quickjs.Context, this quickjs.Value, args []quickjs.Value) qui
 		}
 		return ctx.String(string(content))
 	case "writeFile":
+		if !permissions.AllowFS {
+			return ctx.ThrowError(fmt.Errorf("filesystem access denied. Use --fs flag to allow"))
+		}
 		if len(args) < 3 {
 			return ctx.ThrowTypeError("writeFile requires a file path and content")
 		}
@@ -42,6 +60,9 @@ func Globals(ctx *quickjs.Context, this quickjs.Value, args []quickjs.Value) qui
 		}
 		return ctx.Null()
 	case "fetch":
+		if !permissions.AllowNet {
+			return ctx.ThrowError(fmt.Errorf("network access denied. Use --net flag to allow"))
+		}
 		if len(args) < 2 {
 			return ctx.ThrowTypeError("fetch requires a URL")
 		}
@@ -121,6 +142,30 @@ func Globals(ctx *quickjs.Context, this quickjs.Value, args []quickjs.Value) qui
 		}
 		
 		return ctx.String(string(responseJSON))
+	case "getEnv":
+		if !permissions.AllowEnv {
+			return ctx.ThrowError(fmt.Errorf("environment variable access denied. Use --env flag to allow"))
+		}
+		if len(args) < 2 {
+			return ctx.ThrowTypeError("getEnv requires a variable name")
+		}
+		varName := args[1].String()
+		value := os.Getenv(varName)
+		return ctx.String(value)
+	case "setEnv":
+		if !permissions.AllowEnv {
+			return ctx.ThrowError(fmt.Errorf("environment variable access denied. Use --env flag to allow"))
+		}
+		if len(args) < 3 {
+			return ctx.ThrowTypeError("setEnv requires a variable name and value")
+		}
+		varName := args[1].String()
+		value := args[2].String()
+		err := os.Setenv(varName, value)
+		if err != nil {
+			return ctx.ThrowError(err)
+		}
+		return ctx.Null()
 	}
 
 	return ctx.Null()

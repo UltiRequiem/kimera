@@ -48,9 +48,14 @@ func RunFile(opts RunOptions) error {
 	defer ctx.Free()
 
 	globals := ctx.Globals()
-	globals.Set("__dispatch", ctx.Function(Globals))
-
-	// TODO: Use opts.AllowFS, opts.AllowNet, opts.AllowEnv to control permissions
+	
+	// Set up permission context and pass to globals
+	permissions := PermissionContext{
+		AllowFS:  opts.AllowFS,
+		AllowNet: opts.AllowNet,
+		AllowEnv: opts.AllowEnv,
+	}
+	globals.Set("__dispatch", ctx.Function(MakeGlobals(permissions)))
 
 	// Inject global code
 	globalsResult, err := ctx.Eval(codeGlobals)
