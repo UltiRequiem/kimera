@@ -322,6 +322,185 @@ try {
 kimera run script.js --env
 ```
 
+### Kimera HTTP Server API
+
+The `Kimera` object provides HTTP server functionality for building web servers and APIs.
+
+#### `Kimera.createServer(handler)`
+
+Creates an HTTP server with the specified request handler function.
+
+**Parameters:**
+
+- `handler` (function) - A function that receives a request object and returns a response object
+
+**Request Object:**
+
+- `method` (string) - HTTP method (GET, POST, PUT, DELETE, etc.)
+- `url` (string) - Full URL path including query string
+- `path` (string) - URL path without query string
+- `query` (string) - Query string portion of the URL
+- `headers` (object) - Request headers as key-value pairs
+- `body` (string) - Request body as a string
+
+**Response Object (returned by handler):**
+
+- `status` (number) - HTTP status code (default: 200)
+- `headers` (object) - Response headers as key-value pairs
+- `body` (string) - Response body content
+
+**Returns:**
+
+- (object) - Server object with `listen(port)` and `close()` methods
+
+**Example:**
+
+```javascript
+// Create a simple HTTP server
+const server = Kimera.createServer((request) => {
+  console.log(`${request.method} ${request.path}`);
+  
+  return {
+    status: 200,
+    headers: {
+      "Content-Type": "text/plain",
+    },
+    body: "Hello, World!",
+  };
+});
+
+// Start listening on port 8080
+server.listen(8080);
+```
+
+#### `server.listen(port)`
+
+Starts the HTTP server listening on the specified port.
+
+**Parameters:**
+
+- `port` (number) - Port number to listen on (1-65535)
+
+**Returns:**
+
+- null (this method blocks and processes requests)
+
+**Example:**
+
+```javascript
+const server = Kimera.createServer((request) => {
+  return {
+    status: 200,
+    headers: { "Content-Type": "text/html" },
+    body: "<h1>Welcome</h1>",
+  };
+});
+
+server.listen(3000);
+console.log("Server running on port 3000"); // This won't execute until server stops
+```
+
+#### `server.close()`
+
+Stops the HTTP server and releases the port.
+
+**Returns:**
+
+- null
+
+**Example:**
+
+```javascript
+const server = Kimera.createServer((request) => {
+  if (request.path === "/shutdown") {
+    server.close(); // Stop the server
+    return {
+      status: 200,
+      body: "Server shutting down",
+    };
+  }
+  return { status: 200, body: "OK" };
+});
+
+server.listen(8080);
+```
+
+**HTTP Server Examples:**
+
+**Route Handling:**
+
+```javascript
+const server = Kimera.createServer((request) => {
+  // Route based on path
+  if (request.path === "/") {
+    return {
+      status: 200,
+      headers: { "Content-Type": "text/html" },
+      body: "<h1>Home Page</h1>",
+    };
+  }
+  
+  if (request.path === "/api") {
+    return {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "API endpoint" }),
+    };
+  }
+  
+  // 404 for unknown routes
+  return {
+    status: 404,
+    headers: { "Content-Type": "text/plain" },
+    body: "Not Found",
+  };
+});
+
+server.listen(8080);
+```
+
+**HTTP Method Handling:**
+
+```javascript
+const server = Kimera.createServer((request) => {
+  if (request.path === "/data") {
+    if (request.method === "GET") {
+      return {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: [1, 2, 3] }),
+      };
+    }
+    
+    if (request.method === "POST") {
+      return {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          message: "Created",
+          received: request.body 
+        }),
+      };
+    }
+    
+    return {
+      status: 405,
+      body: "Method Not Allowed",
+    };
+  }
+  
+  return { status: 404, body: "Not Found" };
+});
+
+server.listen(8080);
+```
+
+**Note:** HTTP server operations require the `--net` flag:
+
+```sh
+kimera run server.js --net
+```
+
 ### Global Functions
 
 #### `close()`
@@ -341,8 +520,9 @@ console.log("This won't print");
 Kimera provides the following global objects:
 
 - `console` - Console logging API
-- `Kimera` - File system, environment variables, and runtime API
+- `Kimera` - File system, environment variables, HTTP server, and runtime API
 - `close()` - Function to exit the runtime
+- `fetch()` - HTTP client for making web requests
 
 ## Language Support
 
@@ -505,9 +685,8 @@ Current limitations of Kimera.js:
 - **No module system**: import/export statements not yet supported
 - **No npm packages**: Cannot install or use npm packages
 - **Limited Node.js compatibility**: Only a subset of APIs available
-- **Single-threaded**: No worker threads or parallel execution
+- **Single-threaded request processing**: HTTP server processes one request at a time for thread safety
 - **No DOM APIs**: This is not a browser runtime
-- **HTTP/Fetch API**: Currently experimental with limited functionality
 
 ## Examples
 
@@ -580,4 +759,78 @@ console.log(`Lines: ${result.lines}`);
 
 ```sh
 kimera run script.ts --fs
+```
+
+### Building an HTTP API Server
+
+```javascript
+// Create a REST API server
+const server = Kimera.createServer((request) => {
+  console.log(`${request.method} ${request.path}`);
+  
+  // CORS headers for API
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+  };
+  
+  // Route: GET /users
+  if (request.path === "/users" && request.method === "GET") {
+    return {
+      status: 200,
+      headers,
+      body: JSON.stringify([
+        { id: 1, name: "Alice" },
+        { id: 2, name: "Bob" },
+      ]),
+    };
+  }
+  
+  // Route: POST /users
+  if (request.path === "/users" && request.method === "POST") {
+    const newUser = JSON.parse(request.body);
+    return {
+      status: 201,
+      headers,
+      body: JSON.stringify({ 
+        id: 3, 
+        ...newUser,
+        created: true 
+      }),
+    };
+  }
+  
+  // Route: GET /health
+  if (request.path === "/health") {
+    return {
+      status: 200,
+      headers,
+      body: JSON.stringify({ status: "healthy", uptime: Date.now() }),
+    };
+  }
+  
+  // 404 for unknown routes
+  return {
+    status: 404,
+    headers,
+    body: JSON.stringify({ error: "Not Found" }),
+  };
+});
+
+console.log("API server starting on port 3000...");
+server.listen(3000);
+```
+
+**Run with:**
+
+```sh
+kimera run api.js --net
+```
+
+**Test with:**
+
+```sh
+curl http://localhost:3000/users
+curl -X POST -d '{"name":"Charlie"}' http://localhost:3000/users
+curl http://localhost:3000/health
 ```
