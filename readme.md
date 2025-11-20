@@ -30,6 +30,17 @@ kimera
 
 - TypeScript out of the box
 
+- File handling capabilities
+
+```javascript
+// Read file content
+const content = Kimera.readFile("myFile.txt");
+console.log(content);
+
+// Write content to file
+Kimera.writeFile("output.txt", "Hello World!");
+```
+
 ### Installation
 
 Not yet released, working on automatic builds on
