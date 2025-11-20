@@ -41,6 +41,24 @@ console.log(content);
 Kimera.writeFile("output.txt", "Hello World!");
 ```
 
+- HTTP requests with fetch
+
+```javascript
+// Make a GET request
+const response = fetch("https://api.example.com/data");
+console.log("Status: " + response.status);
+const data = response.json();
+
+// Make a POST request
+const postResponse = fetch("https://api.example.com/data", {
+  method: "POST",
+  body: JSON.stringify({ key: "value" }),
+  headers: {
+    "Content-Type": "application/json"
+  }
+});
+```
+
 ### Installation
 
 Not yet released, working on automatic builds on
