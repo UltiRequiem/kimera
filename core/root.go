@@ -6,6 +6,7 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/UltiRequiem/kimera/core/types"
 	esbuild "github.com/evanw/esbuild/pkg/api"
 	"github.com/lithdew/quickjs"
 )
@@ -48,9 +49,9 @@ func RunFile(opts RunOptions) error {
 	defer ctx.Free()
 
 	globals := ctx.Globals()
-	
+
 	// Set up permission context and pass to globals
-	permissions := PermissionContext{
+	permissions := types.PermissionContext{
 		AllowFS:  opts.AllowFS,
 		AllowNet: opts.AllowNet,
 		AllowEnv: opts.AllowEnv,
@@ -59,19 +60,19 @@ func RunFile(opts RunOptions) error {
 
 	// Inject global code
 	globalsResult, err := ctx.Eval(codeGlobals)
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to inject globals: %w", err)
 	}
-	
+
 	globalsResult.Free()
 
 	result, err := ctx.EvalFile(string(parsedCode.Code), opts.FilePath)
-	
+
 	if err != nil {
 		return fmt.Errorf("runtime error: %w", err)
 	}
-	
+
 	defer result.Free()
 
 	return nil
@@ -79,14 +80,14 @@ func RunFile(opts RunOptions) error {
 
 func formatEsbuildErrors(errors []esbuild.Message) string {
 	result := ""
-	
+
 	for i, err := range errors {
 		if i > 0 {
 			result += "\n"
 		}
-	
+
 		result += fmt.Sprintf("  - %s", err.Text)
-	
+
 		if err.Location != nil {
 			result += fmt.Sprintf(" at %s:%d:%d",
 				err.Location.File,
@@ -95,6 +96,6 @@ func formatEsbuildErrors(errors []esbuild.Message) string {
 			)
 		}
 	}
-	
+
 	return result
 }
