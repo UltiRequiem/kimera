@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>README - Kimera.js</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+        h1 { font-size: 2.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        h2 { font-size: 2rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
+        h3 { font-size: 1.5rem; }
+        h4 { font-size: 1.25rem; }
+        p { margin-bottom: 1rem; }
+        code {
+            background: #f7fafc;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: #666;
+            font-style: italic;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Documentation Index</a>
+<h1>Kimera Test Suite</h1>
+<p>This directory contains the test suite for Kimera.js. Tests are organized by the permissions they require.</p>
+<h2>Directory Structure</h2>
+<p>Tests are organized into subdirectories based on the permissions they need:</p>
+<ul>
+<li><p><strong><code>basic/</code></strong> - Tests that don&#39;t require any special permissions</p>
+<ul>
+<li>Permission denial tests</li>
+<li>Basic functionality tests</li>
+<li>Examples that don&#39;t interact with the system</li>
+</ul>
+</li>
+<li><p><strong><code>fs/</code></strong> - Tests requiring filesystem access (<code>--fs</code> flag)</p>
+<ul>
+<li>File reading tests</li>
+<li>File writing tests</li>
+<li>Filesystem permission tests</li>
+</ul>
+</li>
+<li><p><strong><code>net/</code></strong> - Tests requiring network access (<code>--net</code> flag)</p>
+<ul>
+<li>HTTP fetch tests</li>
+<li>Network permission tests</li>
+</ul>
+</li>
+<li><p><strong><code>env/</code></strong> - Tests requiring environment variable access (<code>--env</code> flag)</p>
+<ul>
+<li>Environment variable read/write tests</li>
+<li>Environment permission tests</li>
+</ul>
+</li>
+<li><p><strong><code>combined/</code></strong> - Tests requiring multiple permissions (<code>--fs --env</code>)</p>
+<ul>
+<li>Tests that use multiple system capabilities</li>
+<li>Integration tests</li>
+</ul>
+</li>
+</ul>
+<h2>Running Tests</h2>
+<h3>Run All Tests</h3>
+<p>The CI system automatically runs all tests with appropriate permissions:</p>
+<pre><code class="language-bash">go build -o kimera
+# Tests are run automatically by directory
+</code></pre>
+<h3>Run Tests by Category</h3>
+<p>Run tests in a specific directory with the appropriate flags:</p>
+<pre><code class="language-bash"># Filesystem tests
+./kimera run testings/fs/file-read.js --fs
+
+# Network tests
+./kimera run testings/net/fetch-get.js --net
+
+# Environment tests
+./kimera run testings/env/permission-env-allowed.js --env
+
+# Combined permission tests
+./kimera run testings/combined/permission-demo.js --fs --env
+
+# Basic tests (no flags needed)
+./kimera run testings/basic/globals.js
+</code></pre>
+<h2>Adding New Tests</h2>
+<p>When adding new tests, place them in the appropriate directory:</p>
+<ol>
+<li><p><strong>Determine required permissions</strong> - What system access does your test need?</p>
+<ul>
+<li>Filesystem access? → <code>fs/</code></li>
+<li>Network access? → <code>net/</code></li>
+<li>Environment variables? → <code>env/</code></li>
+<li>Multiple permissions? → <code>combined/</code></li>
+<li>No permissions? → <code>basic/</code></li>
+</ul>
+</li>
+<li><p><strong>Create your test file</strong> - Use descriptive names:</p>
+<ul>
+<li>Good: <code>file-read-binary.js</code>, <code>fetch-headers.js</code></li>
+<li>Avoid: <code>test1.js</code>, <code>mytest.js</code></li>
+</ul>
+</li>
+<li><p><strong>Follow test conventions</strong>:</p>
+<ul>
+<li>Tests should exit with code 0 on success</li>
+<li>Use <code>console.log()</code> for output</li>
+<li>Use descriptive messages (e.g., &quot;PASS: Test description&quot;)</li>
+<li>Handle errors appropriately</li>
+</ul>
+</li>
+<li><p><strong>No manual CI updates needed</strong> - The CI automatically discovers and runs tests based on directory structure!</p>
+</li>
+</ol>
+<h2>Test File Naming</h2>
+<p>Use descriptive, kebab-case names that indicate what the test does:</p>
+<ul>
+<li>✓ <code>file-read.js</code> - Clear and descriptive</li>
+<li>✓ <code>fetch-post-json.js</code> - Specific about what it tests</li>
+<li>✓ <code>permission-fs-denied.js</code> - Clear about expected behavior</li>
+<li>✗ <code>test.js</code> - Too generic</li>
+<li>✗ <code>myNewTest.js</code> - Not consistent with project style</li>
+</ul>
+<h2>Permission Flags</h2>
+<ul>
+<li><code>--fs</code> - Enables filesystem read/write operations</li>
+<li><code>--net</code> - Enables network/HTTP operations</li>
+<li><code>--env</code> - Enables environment variable access</li>
+</ul>
+<p>Tests are automatically run with the appropriate flags based on their directory.</p>
+
+    </div>
+</body>
+</html>

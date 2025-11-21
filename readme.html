@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>README - Kimera.js</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+        h1 { font-size: 2.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        h2 { font-size: 2rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
+        h3 { font-size: 1.5rem; }
+        h4 { font-size: 1.25rem; }
+        p { margin-bottom: 1rem; }
+        code {
+            background: #f7fafc;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: #666;
+            font-style: italic;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Documentation Index</a>
+<h1>Kimera.js</h1>
+<p>A minimal JavaScript/TypeScript runtime written in Go.</p>
+<p>Built on top of <a href="https://github.com/bellard/quickjs">QuickJS</a> and
+<a href="https://github.com/evanw/esbuild">esbuild</a>, Kimera provides a fast, lightweight
+alternative for running JavaScript and TypeScript code.</p>
+<h2>Quick Start</h2>
+<pre><code class="language-javascript">const asyncSayHello = async (text) =&gt; {
+  console.log(text);
+};
+
+asyncSayHello(&quot;Hello World!&quot;);
+</code></pre>
+<pre><code class="language-sh">kimera run myScript.js
+Hello World!
+</code></pre>
+<h2>Installation</h2>
+<pre><code class="language-bash">go install github.com/UltiRequiem/kimera@latest
+</code></pre>
+<h2>Features</h2>
+<p>Kimera.js provides a lightweight JavaScript/TypeScript runtime with the
+following capabilities:</p>
+<h3>1. Interactive REPL</h3>
+<p>Launch an interactive Read-Eval-Print Loop for testing JavaScript code:</p>
+<pre><code class="language-sh">kimera
+</code></pre>
+<p>The REPL supports:</p>
+<ul>
+<li>Multi-line statements</li>
+<li>Variable persistence across commands</li>
+<li>Full JavaScript ES6+ syntax</li>
+<li>Exit using <code>Ctrl+C</code> or <code>Ctrl+D</code></li>
+</ul>
+<h3>2. Script Execution</h3>
+<p>Run JavaScript or TypeScript files directly:</p>
+<pre><code class="language-sh">kimera run myScript.js
+kimera run myScript.ts
+</code></pre>
+<p><strong>Permission Flags</strong>:</p>
+<p>Kimera implements a secure-by-default permission system. Scripts must explicitly request access to sensitive operations:</p>
+<pre><code class="language-sh">kimera run script.js --fs    # Allow filesystem access
+kimera run script.js --net   # Allow network access
+kimera run script.js --env   # Allow environment variable access
+
+# Multiple flags can be combined
+kimera run script.js --fs --net --env
+</code></pre>
+<h3>3. TypeScript Support</h3>
+<p>Native TypeScript support out of the box - no configuration needed. Kimera
+automatically transpiles TypeScript files using esbuild:</p>
+<pre><code class="language-typescript">const greet = (name: string): void =&gt; {
+  console.log(`Hello, ${name}!`);
+};
+
+greet(&quot;World&quot;);
+</code></pre>
+<h3>4. Modern JavaScript Features</h3>
+<p>Full support for modern JavaScript syntax including:</p>
+<ul>
+<li>Async/await</li>
+<li>Arrow functions</li>
+<li>Template literals</li>
+<li>Destructuring</li>
+<li>ES6+ features</li>
+<li>Promises</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-javascript">const fetchData = async () =&gt; {
+  return &quot;Data loaded&quot;;
+};
+
+fetchData().then((data) =&gt; console.log(data));
+</code></pre>
+<h3>5. Console API</h3>
+<p>Standard console logging functionality:</p>
+<pre><code class="language-javascript">console.log(&quot;Simple message&quot;);
+console.log(&quot;Multiple&quot;, &quot;arguments&quot;, &quot;supported&quot;);
+console.log(`Template literals: ${1 + 1}`);
+</code></pre>
+<h3>6. File System API</h3>
+<p>Built-in file handling through the <code>Kimera</code> global object:</p>
+<h4>Reading Files</h4>
+<pre><code class="language-javascript">// Read file content as string
+const content = Kimera.readFile(&quot;path/to/file.txt&quot;);
+console.log(content);
+</code></pre>
+<h4>Writing Files</h4>
+<pre><code class="language-javascript">// Write string content to file
+Kimera.writeFile(&quot;path/to/output.txt&quot;, &quot;Hello World!&quot;);
+
+// Write multi-line content
+const data = &quot;Line 1\nLine 2\nLine 3&quot;;
+Kimera.writeFile(&quot;output.txt&quot;, data);
+</code></pre>
+<h4>Error Handling</h4>
+<p>File operations throw errors for invalid operations:</p>
+<pre><code class="language-javascript">try {
+  const content = Kimera.readFile(&quot;nonexistent.txt&quot;);
+} catch (error) {
+  console.log(&quot;File not found!&quot;);
+}
+</code></pre>
+<h3>7. Environment Variables API</h3>
+<p>Access and modify environment variables through the <code>Kimera</code> global object (requires <code>--env</code> flag):</p>
+<h4>Reading Environment Variables</h4>
+<pre><code class="language-javascript">// Get an environment variable
+const path = Kimera.getEnv(&quot;PATH&quot;);
+console.log(&quot;PATH:&quot;, path);
+
+// Check if a variable exists
+const myVar = Kimera.getEnv(&quot;MY_VAR&quot;);
+if (myVar) {
+  console.log(&quot;MY_VAR is set to:&quot;, myVar);
+} else {
+  console.log(&quot;MY_VAR is not set&quot;);
+}
+</code></pre>
+<h4>Setting Environment Variables</h4>
+<pre><code class="language-javascript">// Set an environment variable
+Kimera.setEnv(&quot;MY_VAR&quot;, &quot;my_value&quot;);
+
+// Verify it was set
+const value = Kimera.getEnv(&quot;MY_VAR&quot;);
+console.log(value); // &quot;my_value&quot;
+</code></pre>
+<h4>Error Handling</h4>
+<p>Environment operations throw errors when permission is not granted:</p>
+<pre><code class="language-javascript">try {
+  const value = Kimera.getEnv(&quot;PATH&quot;);
+} catch (error) {
+  console.log(&quot;Environment access denied!&quot;);
+}
+</code></pre>
+<p><strong>Note:</strong> Environment variable operations require the <code>--env</code> flag:</p>
+<pre><code class="language-sh">kimera run script.js --env
+</code></pre>
+<h3>8. Global Objects</h3>
+<p>Kimera provides the following global objects:</p>
+<ul>
+<li><code>console</code> - Console logging API</li>
+<li><code>Kimera</code> - File system, environment variables, and runtime API</li>
+<li><code>close()</code> - Function to exit the runtime</li>
+</ul>
+<h3>9. Version Information</h3>
+<p>Check the installed Kimera version:</p>
+<pre><code class="language-sh">kimera version
+</code></pre>
+<h3>10. HTTP/Fetch API (Experimental)</h3>
+<p>Make HTTP requests with the fetch API (requires <code>--net</code> flag):</p>
+<pre><code class="language-javascript">// Make a GET request
+const response = fetch(&quot;https://api.example.com/data&quot;);
+console.log(&quot;Status: &quot; + response.status);
+const data = response.json();
+
+// Make a POST request
+const postResponse = fetch(&quot;https://api.example.com/data&quot;, {
+  method: &quot;POST&quot;,
+  body: JSON.stringify({ key: &quot;value&quot; }),
+  headers: {
+    &quot;Content-Type&quot;: &quot;application/json&quot;,
+  },
+});
+</code></pre>
+<p><strong>Note:</strong> Network operations require the <code>--net</code> flag:</p>
+<pre><code class="language-sh">kimera run script.js --net
+</code></pre>
+<h2>CLI Usage</h2>
+<pre><code class="language-sh"># Run the REPL (all permissions enabled)
+kimera
+
+# Run a JavaScript file
+kimera run script.js
+
+# Run a TypeScript file
+kimera run script.ts
+
+# Run with specific permissions
+kimera run script.js --fs           # Filesystem access
+kimera run script.js --net          # Network access
+kimera run script.js --env          # Environment variables
+kimera run script.js --fs --net     # Multiple permissions
+
+# Check version
+kimera version
+
+# Get help
+kimera --help
+</code></pre>
+<h2>Development</h2>
+<h3>Building from Source</h3>
+<pre><code class="language-bash">git clone https://github.com/UltiRequiem/kimera.git
+cd kimera
+go build
+</code></pre>
+<h3>Running Tests</h3>
+<pre><code class="language-bash">go test ./...
+</code></pre>
+<h2>Documentation</h2>
+<p>The full documentation for Kimera.js is available online at GitHub Pages. It is automatically deployed from Markdown files in the repository whenever changes are made.</p>
+<p><strong><a href="https://ultirequiem.github.io/kimera/">View Documentation</a></strong></p>
+<p>The documentation includes:</p>
+<ul>
+<li>Complete API reference</li>
+<li>Getting started guides</li>
+<li>Examples and tutorials</li>
+<li>Testing documentation</li>
+</ul>
+<h3>How Documentation Works</h3>
+<p>Documentation is automatically generated and deployed:</p>
+<ol>
+<li><p><strong>Automatic Deployment</strong>: The <code>.github/workflows/deploy-docs.yaml</code> workflow automatically deploys documentation to GitHub Pages when:</p>
+<ul>
+<li>A pull request updates any <code>.md</code> file</li>
+<li>Changes are pushed to the <code>main</code> branch that affect <code>.md</code> files</li>
+</ul>
+</li>
+<li><p><strong>Documentation Sources</strong>: All Markdown files in the repository (except those in <code>.github/</code> and <code>node_modules/</code>) are:</p>
+<ul>
+<li>Converted to styled HTML pages</li>
+<li>Listed in an auto-generated index page</li>
+<li>Deployed to the <code>gh-pages</code> branch</li>
+</ul>
+</li>
+<li><p><strong>Contributing to Documentation</strong>: To update documentation:</p>
+<ul>
+<li>Edit any <code>.md</code> file in the repository</li>
+<li>Submit a pull request</li>
+<li>Documentation is automatically deployed when the PR is merged</li>
+</ul>
+</li>
+</ol>
+<p>No manual steps are required to deploy documentation updates.</p>
+<h2>Roadmap</h2>
+<ul>
+<li><input disabled="" type="checkbox"> Module system (import/export)</li>
+<li><input disabled="" type="checkbox"> npm package support</li>
+<li><input disabled="" type="checkbox"> More Node.js API compatibility</li>
+<li><input disabled="" type="checkbox"> Better error messages</li>
+<li><input disabled="" type="checkbox"> Debugger support</li>
+<li><input checked="" disabled="" type="checkbox"> Permission system implementation (--fs, --net, --env flags)</li>
+</ul>
+<h2>Contributing</h2>
+<p>Contributions are welcome! Please feel free to submit a Pull Request.</p>
+<h2>License</h2>
+<p>Kimera.js is licensed under the MIT License.</p>
+
+    </div>
+</body>
+</html>

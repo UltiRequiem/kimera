@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Kimera.js</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+        h1 { font-size: 2.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        h2 { font-size: 2rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
+        h3 { font-size: 1.5rem; }
+        h4 { font-size: 1.25rem; }
+        p { margin-bottom: 1rem; }
+        code {
+            background: #f7fafc;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: #666;
+            font-style: italic;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Documentation Index</a>
+<h1>Kimera.js API Documentation</h1>
+<p>This document provides comprehensive documentation of all APIs available in
+Kimera.js.</p>
+<h2>Command Line Interface</h2>
+<h3><code>kimera</code></h3>
+<p>Launch the interactive REPL (Read-Eval-Print Loop).</p>
+<pre><code class="language-sh">kimera
+</code></pre>
+<p><strong>Behavior:</strong></p>
+<ul>
+<li>Starts an interactive JavaScript console</li>
+<li>Displays version information on startup</li>
+<li>Evaluates JavaScript expressions in real-time</li>
+<li>Maintains a single QuickJS runtime for the entire session (efficient)</li>
+<li>Exit with <code>Ctrl+C</code>, <code>Ctrl+D</code>, or by calling <code>close()</code></li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre><code class="language-sh">$ kimera
+Kimera 0.2.0
+Exit using Ctrl+C or Ctrl+D
+
+&gt; const x = 10
+undefined
+&gt; x * 2
+20
+&gt; console.log(&quot;Hello!&quot;)
+Hello!
+undefined
+&gt; const add = (a, b) =&gt; a + b
+undefined
+&gt; add(5, 3)
+8
+</code></pre>
+<h3><code>kimera run [file]</code></h3>
+<p>Execute a JavaScript or TypeScript file.</p>
+<pre><code class="language-sh">kimera run &lt;file&gt; [flags]
+</code></pre>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>file</code> (required) - Path to the JavaScript (.js) or TypeScript (.ts) file to
+execute</li>
+</ul>
+<p><strong>Flags:</strong></p>
+<ul>
+<li><code>--fs</code> - Allow filesystem access (required for <code>Kimera.readFile()</code> and <code>Kimera.writeFile()</code>)</li>
+<li><code>--net</code> - Allow network access (required for <code>fetch()</code>)</li>
+<li><code>--env</code> - Allow environment variable access (required for <code>Kimera.getEnv()</code> and <code>Kimera.setEnv()</code>)</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-sh"># Run a JavaScript file (no permissions)
+kimera run script.js
+
+# Run a TypeScript file with type annotations
+kimera run app.ts
+
+# Run with permission flags
+kimera run script.js --fs              # Filesystem only
+kimera run script.js --net             # Network only
+kimera run script.js --env             # Environment variables only
+kimera run script.js --fs --net --env  # All permissions
+</code></pre>
+<p><strong>Error Handling:</strong></p>
+<p>The command returns proper exit codes:</p>
+<ul>
+<li><code>0</code> - Success</li>
+<li><code>1</code> - Error (file not found, syntax error, runtime error)</li>
+</ul>
+<p>Error messages are formatted with context:</p>
+<pre><code class="language-sh">$ kimera run missing.js
+Error: failed to run file: failed to read file &quot;missing.js&quot;: open missing.js: no such file or directory
+</code></pre>
+<h3><code>kimera version</code></h3>
+<p>Display the version of Kimera.js.</p>
+<pre><code class="language-sh">kimera version
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code>Kimera 0.2.0
+</code></pre>
+<h3><code>kimera help</code> / <code>kimera --help</code></h3>
+<p>Display help information about available commands.</p>
+<pre><code class="language-sh">kimera --help
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code>Kimera is a modern JavaScript/TypeScript runtime that provides a REPL
+and file execution capabilities.
+
+Usage:
+  kimera [flags]
+  kimera [command]
+
+Available Commands:
+  help        Help about any command
+  run         Run a JavaScript or TypeScript file
+  version     Print the version information
+
+Flags:
+  -h, --help   help for kimera
+
+Use &quot;kimera [command] --help&quot; for more information about a command.
+</code></pre>
+<h2>JavaScript/TypeScript APIs</h2>
+<h3>Console API</h3>
+<h4><code>console.log(...args)</code></h4>
+<p>Prints messages to standard output.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>...args</code> - Any number of arguments to print</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre><code class="language-javascript">console.log(&quot;Hello&quot;);
+console.log(&quot;Multiple&quot;, &quot;arguments&quot;);
+console.log(&quot;Value:&quot;, 42);
+console.log(`Template: ${1 + 1}`);
+</code></pre>
+<h3>Kimera File System API</h3>
+<p>The <code>Kimera</code> object provides file system operations.</p>
+<h4><code>Kimera.readFile(filePath)</code></h4>
+<p>Reads the entire contents of a file as a string.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>filePath</code> (string) - Path to the file to read</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul>
+<li>(string) - The file contents as a string</li>
+</ul>
+<p><strong>Throws:</strong></p>
+<ul>
+<li>Error if file doesn&#39;t exist or cannot be read</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre><code class="language-javascript">// Read a text file
+const content = Kimera.readFile(&quot;./data.txt&quot;);
+console.log(content);
+
+// Read with error handling
+try {
+  const data = Kimera.readFile(&quot;./config.json&quot;);
+  console.log(data);
+} catch (error) {
+  console.log(&quot;Failed to read file&quot;);
+}
+</code></pre>
+<h4><code>Kimera.writeFile(filePath, content)</code></h4>
+<p>Writes content to a file, creating it if it doesn&#39;t exist or overwriting if it
+does.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>filePath</code> (string) - Path to the file to write</li>
+<li><code>content</code> (string) - Content to write to the file</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul>
+<li>null</li>
+</ul>
+<p><strong>Throws:</strong></p>
+<ul>
+<li>Error if file cannot be written</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre><code class="language-javascript">// Write simple text
+Kimera.writeFile(&quot;output.txt&quot;, &quot;Hello World!&quot;);
+
+// Write multi-line content
+const data = &quot;Line 1\nLine 2\nLine 3&quot;;
+Kimera.writeFile(&quot;multiline.txt&quot;, data);
+
+// Overwrite existing file
+Kimera.writeFile(&quot;existing.txt&quot;, &quot;New content&quot;);
+
+// Write with error handling
+try {
+  Kimera.writeFile(&quot;/protected/file.txt&quot;, &quot;data&quot;);
+} catch (error) {
+  console.log(&quot;Permission denied&quot;);
+}
+</code></pre>
+<p><strong>Note:</strong> File system operations require the <code>--fs</code> flag:</p>
+<pre><code class="language-sh">kimera run script.js --fs
+</code></pre>
+<h3>Kimera Environment Variables API</h3>
+<p>The <code>Kimera</code> object provides environment variable operations.</p>
+<h4><code>Kimera.getEnv(varName)</code></h4>
+<p>Reads the value of an environment variable.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>varName</code> (string) - Name of the environment variable to read</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul>
+<li>(string) - The value of the environment variable, or an empty string if not set</li>
+</ul>
+<p><strong>Throws:</strong></p>
+<ul>
+<li>Error if environment variable access is not allowed (requires <code>--env</code> flag)</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre><code class="language-javascript">// Read an environment variable
+const path = Kimera.getEnv(&quot;PATH&quot;);
+console.log(&quot;PATH:&quot;, path);
+
+// Check if a variable exists
+const myVar = Kimera.getEnv(&quot;MY_VAR&quot;);
+if (myVar) {
+  console.log(&quot;MY_VAR is set to:&quot;, myVar);
+} else {
+  console.log(&quot;MY_VAR is not set&quot;);
+}
+
+// With error handling
+try {
+  const home = Kimera.getEnv(&quot;HOME&quot;);
+  console.log(&quot;Home directory:&quot;, home);
+} catch (error) {
+  console.log(&quot;Environment access denied&quot;);
+}
+</code></pre>
+<h4><code>Kimera.setEnv(varName, value)</code></h4>
+<p>Sets the value of an environment variable in the current process.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>varName</code> (string) - Name of the environment variable to set</li>
+<li><code>value</code> (string) - Value to set the environment variable to</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul>
+<li>null</li>
+</ul>
+<p><strong>Throws:</strong></p>
+<ul>
+<li>Error if environment variable access is not allowed (requires <code>--env</code> flag)</li>
+<li>Error if the operation fails</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre><code class="language-javascript">// Set an environment variable
+Kimera.setEnv(&quot;MY_VAR&quot;, &quot;my_value&quot;);
+
+// Verify it was set
+const value = Kimera.getEnv(&quot;MY_VAR&quot;);
+console.log(value); // &quot;my_value&quot;
+
+// Set with error handling
+try {
+  Kimera.setEnv(&quot;CONFIG_PATH&quot;, &quot;/etc/config&quot;);
+  console.log(&quot;Environment variable set successfully&quot;);
+} catch (error) {
+  console.log(&quot;Failed to set environment variable&quot;);
+}
+</code></pre>
+<p><strong>Note:</strong> Environment variable operations require the <code>--env</code> flag:</p>
+<pre><code class="language-sh">kimera run script.js --env
+</code></pre>
+<h3>Kimera HTTP Server API</h3>
+<p>The <code>Kimera</code> object provides HTTP server functionality for building web servers and APIs.</p>
+<h4><code>Kimera.createServer(handler)</code></h4>
+<p>Creates an HTTP server with the specified request handler function.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>handler</code> (function) - A function that receives a request object and returns a response object</li>
+</ul>
+<p><strong>Request Object:</strong></p>
+<ul>
+<li><code>method</code> (string) - HTTP method (GET, POST, PUT, DELETE, etc.)</li>
+<li><code>url</code> (string) - Full URL path including query string</li>
+<li><code>path</code> (string) - URL path without query string</li>
+<li><code>query</code> (string) - Query string portion of the URL</li>
+<li><code>headers</code> (object) - Request headers as key-value pairs</li>
+<li><code>body</code> (string) - Request body as a string</li>
+</ul>
+<p><strong>Response Object (returned by handler):</strong></p>
+<ul>
+<li><code>status</code> (number) - HTTP status code (default: 200)</li>
+<li><code>headers</code> (object) - Response headers as key-value pairs</li>
+<li><code>body</code> (string) - Response body content</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul>
+<li>(object) - Server object with <code>listen(port)</code> and <code>close()</code> methods</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre><code class="language-javascript">// Create a simple HTTP server
+const server = Kimera.createServer((request) =&gt; {
+  console.log(`${request.method} ${request.path}`);
+  
+  return {
+    status: 200,
+    headers: {
+      &quot;Content-Type&quot;: &quot;text/plain&quot;,
+    },
+    body: &quot;Hello, World!&quot;,
+  };
+});
+
+// Start listening on port 8080
+server.listen(8080);
+</code></pre>
+<h4><code>server.listen(port)</code></h4>
+<p>Starts the HTTP server listening on the specified port.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>port</code> (number) - Port number to listen on (1-65535)</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul>
+<li>null (this method blocks and processes requests)</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre><code class="language-javascript">const server = Kimera.createServer((request) =&gt; {
+  return {
+    status: 200,
+    headers: { &quot;Content-Type&quot;: &quot;text/html&quot; },
+    body: &quot;&lt;h1&gt;Welcome&lt;/h1&gt;&quot;,
+  };
+});
+
+server.listen(3000);
+console.log(&quot;Server running on port 3000&quot;); // This won&#39;t execute until server stops
+</code></pre>
+<h4><code>server.close()</code></h4>
+<p>Stops the HTTP server and releases the port.</p>
+<p><strong>Returns:</strong></p>
+<ul>
+<li>null</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre><code class="language-javascript">const server = Kimera.createServer((request) =&gt; {
+  if (request.path === &quot;/shutdown&quot;) {
+    server.close(); // Stop the server
+    return {
+      status: 200,
+      body: &quot;Server shutting down&quot;,
+    };
+  }
+  return { status: 200, body: &quot;OK&quot; };
+});
+
+server.listen(8080);
+</code></pre>
+<p><strong>HTTP Server Examples:</strong></p>
+<p><strong>Route Handling:</strong></p>
+<pre><code class="language-javascript">const server = Kimera.createServer((request) =&gt; {
+  // Route based on path
+  if (request.path === &quot;/&quot;) {
+    return {
+      status: 200,
+      headers: { &quot;Content-Type&quot;: &quot;text/html&quot; },
+      body: &quot;&lt;h1&gt;Home Page&lt;/h1&gt;&quot;,
+    };
+  }
+  
+  if (request.path === &quot;/api&quot;) {
+    return {
+      status: 200,
+      headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },
+      body: JSON.stringify({ message: &quot;API endpoint&quot; }),
+    };
+  }
+  
+  // 404 for unknown routes
+  return {
+    status: 404,
+    headers: { &quot;Content-Type&quot;: &quot;text/plain&quot; },
+    body: &quot;Not Found&quot;,
+  };
+});
+
+server.listen(8080);
+</code></pre>
+<p><strong>HTTP Method Handling:</strong></p>
+<pre><code class="language-javascript">const server = Kimera.createServer((request) =&gt; {
+  if (request.path === &quot;/data&quot;) {
+    if (request.method === &quot;GET&quot;) {
+      return {
+        status: 200,
+        headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },
+        body: JSON.stringify({ items: [1, 2, 3] }),
+      };
+    }
+    
+    if (request.method === &quot;POST&quot;) {
+      return {
+        status: 201,
+        headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },
+        body: JSON.stringify({ 
+          message: &quot;Created&quot;,
+          received: request.body 
+        }),
+      };
+    }
+    
+    return {
+      status: 405,
+      body: &quot;Method Not Allowed&quot;,
+    };
+  }
+  
+  return { status: 404, body: &quot;Not Found&quot; };
+});
+
+server.listen(8080);
+</code></pre>
+<p><strong>Note:</strong> HTTP server operations require the <code>--net</code> flag:</p>
+<pre><code class="language-sh">kimera run server.js --net
+</code></pre>
+<h3>Global Functions</h3>
+<h4><code>close()</code></h4>
+<p>Exits the Kimera runtime immediately.</p>
+<p><strong>Example:</strong></p>
+<pre><code class="language-javascript">console.log(&quot;Before exit&quot;);
+close();
+console.log(&quot;This won&#39;t print&quot;);
+</code></pre>
+<h3>Global Objects</h3>
+<p>Kimera provides the following global objects:</p>
+<ul>
+<li><code>console</code> - Console logging API</li>
+<li><code>Kimera</code> - File system, environment variables, HTTP server, and runtime API</li>
+<li><code>close()</code> - Function to exit the runtime</li>
+<li><code>fetch()</code> - HTTP client for making web requests</li>
+</ul>
+<h2>Language Support</h2>
+<h3>JavaScript</h3>
+<p>Kimera.js supports modern JavaScript (ES6+) including:</p>
+<ul>
+<li><p><strong>Arrow Functions</strong></p>
+<pre><code class="language-javascript">const add = (a, b) =&gt; a + b;
+</code></pre>
+</li>
+<li><p><strong>Template Literals</strong></p>
+<pre><code class="language-javascript">const name = &quot;World&quot;;
+console.log(`Hello, ${name}!`);
+</code></pre>
+</li>
+<li><p><strong>Async/Await</strong></p>
+<pre><code class="language-javascript">const asyncFunc = async () =&gt; {
+  return &quot;result&quot;;
+};
+
+asyncFunc().then(console.log);
+</code></pre>
+</li>
+<li><p><strong>Destructuring</strong></p>
+<pre><code class="language-javascript">const obj = { a: 1, b: 2 };
+const { a, b } = obj;
+</code></pre>
+</li>
+<li><p><strong>Spread Operator</strong></p>
+<pre><code class="language-javascript">const arr = [1, 2, 3];
+const arr2 = [...arr, 4, 5];
+</code></pre>
+</li>
+<li><p><strong>For...of Loops</strong></p>
+<pre><code class="language-javascript">for (const item of [1, 2, 3]) {
+  console.log(item);
+}
+</code></pre>
+</li>
+</ul>
+<h3>TypeScript</h3>
+<p>Full TypeScript support with automatic transpilation:</p>
+<pre><code class="language-typescript">// Type annotations
+const greet = (name: string): string =&gt; {
+  return `Hello, ${name}!`;
+};
+
+// Interfaces
+interface User {
+  name: string;
+  age: number;
+}
+
+const user: User = {
+  name: &quot;Alice&quot;,
+  age: 30,
+};
+
+// Generics
+function identity&lt;T&gt;(arg: T): T {
+  return arg;
+}
+</code></pre>
+<p><strong>Note:</strong> TypeScript is transpiled to JavaScript using esbuild, so type checking
+happens at transpilation time, not runtime.</p>
+<h2>Error Handling</h2>
+<p>All file operations and runtime errors can be caught using try-catch:</p>
+<pre><code class="language-javascript">try {
+  const content = Kimera.readFile(&quot;missing.txt&quot;);
+} catch (error) {
+  console.log(&quot;Error occurred:&quot;, error);
+}
+
+try {
+  Kimera.writeFile(&quot;/root/protected.txt&quot;, &quot;data&quot;);
+} catch (error) {
+  console.log(&quot;Permission denied&quot;);
+}
+</code></pre>
+<h2>Best Practices</h2>
+<ol>
+<li><p><strong>Always handle file errors</strong>: Use try-catch blocks when reading or writing
+files</p>
+<pre><code class="language-javascript">try {
+  const data = Kimera.readFile(filename);
+} catch (error) {
+  console.log(&quot;File operation failed&quot;);
+}
+</code></pre>
+</li>
+<li><p><strong>Use async/await for cleaner code</strong>: Kimera supports modern async patterns</p>
+<pre><code class="language-javascript">const main = async () =&gt; {
+  // Your async code here
+};
+
+main();
+</code></pre>
+</li>
+<li><p><strong>Leverage TypeScript for type safety</strong>: Use .ts files for better development
+experience</p>
+<pre><code class="language-typescript">interface Config {
+  port: number;
+  host: string;
+}
+</code></pre>
+</li>
+</ol>
+<h2>Architecture &amp; Implementation Details</h2>
+<h3>Error Handling</h3>
+<p>Kimera uses Go&#39;s idiomatic error handling patterns:</p>
+<ul>
+<li>All errors are properly wrapped with context using <code>fmt.Errorf</code> with <code>%w</code></li>
+<li>Error chains can be inspected using <code>errors.Is</code> and <code>errors.As</code></li>
+<li>Clear error messages indicate the operation that failed and why</li>
+</ul>
+<p>Example error flow:</p>
+<pre><code>Error: failed to run file: failed to read file &quot;script.js&quot;: open script.js: no such file or directory
+       [cmd layer]          [core layer]           [os layer]
+</code></pre>
+<h3>Resource Management</h3>
+<ul>
+<li>QuickJS runtimes and contexts are properly freed using <code>defer</code></li>
+<li>REPL maintains a single runtime for the entire session (performance
+optimization)</li>
+<li>Each <code>kimera run</code> command creates a fresh runtime (isolation)</li>
+</ul>
+<h3>TypeScript Transpilation</h3>
+<ul>
+<li>TypeScript files are transpiled to JavaScript using esbuild</li>
+<li>Transpilation happens at runtime before execution</li>
+<li>No separate build step required</li>
+<li>Type checking occurs during transpilation</li>
+</ul>
+<h2>Limitations</h2>
+<p>Current limitations of Kimera.js:</p>
+<ul>
+<li><strong>No module system</strong>: import/export statements not yet supported</li>
+<li><strong>No npm packages</strong>: Cannot install or use npm packages</li>
+<li><strong>Limited Node.js compatibility</strong>: Only a subset of APIs available</li>
+<li><strong>Single-threaded request processing</strong>: HTTP server processes one request at a time for thread safety</li>
+<li><strong>No DOM APIs</strong>: This is not a browser runtime</li>
+</ul>
+<h2>Examples</h2>
+<h3>Reading and Processing a File</h3>
+<pre><code class="language-javascript">// Read a file and count lines
+const content = Kimera.readFile(&quot;data.txt&quot;);
+const lines = content.split(&quot;\n&quot;);
+console.log(`File has ${lines.length} lines`);
+</code></pre>
+<p><strong>Run with:</strong></p>
+<pre><code class="language-sh">kimera run script.js --fs
+</code></pre>
+<h3>Creating a Log File</h3>
+<pre><code class="language-javascript">const logMessage = (message) =&gt; {
+  const timestamp = new Date().toISOString();
+  const logEntry = `[${timestamp}] ${message}\n`;
+
+  try {
+    // Append to log (read existing, append, write back)
+    let existingLog = &quot;&quot;;
+    try {
+      existingLog = Kimera.readFile(&quot;app.log&quot;);
+    } catch (e) {
+      // File doesn&#39;t exist yet, that&#39;s okay
+    }
+    Kimera.writeFile(&quot;app.log&quot;, existingLog + logEntry);
+  } catch (error) {
+    console.log(&quot;Failed to write log&quot;);
+  }
+};
+
+logMessage(&quot;Application started&quot;);
+logMessage(&quot;Processing data&quot;);
+</code></pre>
+<p><strong>Run with:</strong></p>
+<pre><code class="language-sh">kimera run script.js --fs
+</code></pre>
+<h3>TypeScript with File Operations</h3>
+<pre><code class="language-typescript">interface FileData {
+  content: string;
+  lines: number;
+}
+
+const analyzeFile = (path: string): FileData =&gt; {
+  const content: string = Kimera.readFile(path);
+  const lines: number = content.split(&quot;\n&quot;).length;
+
+  return { content, lines };
+};
+
+const result = analyzeFile(&quot;data.txt&quot;);
+console.log(`Lines: ${result.lines}`);
+</code></pre>
+<p><strong>Run with:</strong></p>
+<pre><code class="language-sh">kimera run script.ts --fs
+</code></pre>
+<h3>Building an HTTP API Server</h3>
+<pre><code class="language-javascript">// Create a REST API server
+const server = Kimera.createServer((request) =&gt; {
+  console.log(`${request.method} ${request.path}`);
+  
+  // CORS headers for API
+  const headers = {
+    &quot;Content-Type&quot;: &quot;application/json&quot;,
+    &quot;Access-Control-Allow-Origin&quot;: &quot;*&quot;,
+  };
+  
+  // Route: GET /users
+  if (request.path === &quot;/users&quot; &amp;&amp; request.method === &quot;GET&quot;) {
+    return {
+      status: 200,
+      headers,
+      body: JSON.stringify([
+        { id: 1, name: &quot;Alice&quot; },
+        { id: 2, name: &quot;Bob&quot; },
+      ]),
+    };
+  }
+  
+  // Route: POST /users
+  if (request.path === &quot;/users&quot; &amp;&amp; request.method === &quot;POST&quot;) {
+    const newUser = JSON.parse(request.body);
+    return {
+      status: 201,
+      headers,
+      body: JSON.stringify({ 
+        id: 3, 
+        ...newUser,
+        created: true 
+      }),
+    };
+  }
+  
+  // Route: GET /health
+  if (request.path === &quot;/health&quot;) {
+    return {
+      status: 200,
+      headers,
+      body: JSON.stringify({ status: &quot;healthy&quot;, uptime: Date.now() }),
+    };
+  }
+  
+  // 404 for unknown routes
+  return {
+    status: 404,
+    headers,
+    body: JSON.stringify({ error: &quot;Not Found&quot; }),
+  };
+});
+
+console.log(&quot;API server starting on port 3000...&quot;);
+server.listen(3000);
+</code></pre>
+<p><strong>Run with:</strong></p>
+<pre><code class="language-sh">kimera run api.js --net
+</code></pre>
+<p><strong>Test with:</strong></p>
+<pre><code class="language-sh">curl http://localhost:3000/users
+curl -X POST -d &#39;{&quot;name&quot;:&quot;Charlie&quot;}&#39; http://localhost:3000/users
+curl http://localhost:3000/health
+</code></pre>
+
+    </div>
+</body>
+</html>
