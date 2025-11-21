@@ -1,14 +1,15 @@
-package core
+package handlers
 
 import (
 	"fmt"
 	"os"
 
+	"github.com/UltiRequiem/kimera/core/types"
 	"github.com/lithdew/quickjs"
 )
 
-// handleGetEnv handles reading environment variables
-func handleGetEnv(ctx *quickjs.Context, args []quickjs.Value, permissions PermissionContext) quickjs.Value {
+// GetEnv handles reading environment variables
+func GetEnv(ctx *quickjs.Context, args []quickjs.Value, permissions types.PermissionContext) quickjs.Value {
 	if !permissions.AllowEnv {
 		return ctx.ThrowError(fmt.Errorf("environment variable access denied. Use --env flag to allow"))
 	}
@@ -20,8 +21,8 @@ func handleGetEnv(ctx *quickjs.Context, args []quickjs.Value, permissions Permis
 	return ctx.String(value)
 }
 
-// handleSetEnv handles setting environment variables
-func handleSetEnv(ctx *quickjs.Context, args []quickjs.Value, permissions PermissionContext) quickjs.Value {
+// SetEnv handles setting environment variables
+func SetEnv(ctx *quickjs.Context, args []quickjs.Value, permissions types.PermissionContext) quickjs.Value {
 	if !permissions.AllowEnv {
 		return ctx.ThrowError(fmt.Errorf("environment variable access denied. Use --env flag to allow"))
 	}

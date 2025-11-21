@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/UltiRequiem/kimera/core/types"
 	"github.com/lithdew/quickjs"
 )
 
@@ -23,7 +24,7 @@ func Repl() error {
 
 	// Inject globals
 	// In REPL mode, allow all permissions by default
-	permissions := PermissionContext{
+	permissions := types.PermissionContext{
 		AllowFS:  true,
 		AllowNet: true,
 		AllowEnv: true,

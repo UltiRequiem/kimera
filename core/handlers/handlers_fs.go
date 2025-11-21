@@ -1,14 +1,15 @@
-package core
+package handlers
 
 import (
 	"fmt"
 	"os"
 
+	"github.com/UltiRequiem/kimera/core/types"
 	"github.com/lithdew/quickjs"
 )
 
-// handleReadFile handles file reading operations
-func handleReadFile(ctx *quickjs.Context, args []quickjs.Value, permissions PermissionContext) quickjs.Value {
+// ReadFile handles file reading operations
+func ReadFile(ctx *quickjs.Context, args []quickjs.Value, permissions types.PermissionContext) quickjs.Value {
 	if !permissions.AllowFS {
 		return ctx.ThrowError(fmt.Errorf("filesystem access denied. Use --fs flag to allow"))
 	}
@@ -23,8 +24,8 @@ func handleReadFile(ctx *quickjs.Context, args []quickjs.Value, permissions Perm
 	return ctx.String(string(content))
 }
 
-// handleWriteFile handles file writing operations
-func handleWriteFile(ctx *quickjs.Context, args []quickjs.Value, permissions PermissionContext) quickjs.Value {
+// WriteFile handles file writing operations
+func WriteFile(ctx *quickjs.Context, args []quickjs.Value, permissions types.PermissionContext) quickjs.Value {
 	if !permissions.AllowFS {
 		return ctx.ThrowError(fmt.Errorf("filesystem access denied. Use --fs flag to allow"))
 	}

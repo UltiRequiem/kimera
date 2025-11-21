@@ -7,6 +7,7 @@ import (
 	"runtime"
 
 	esbuild "github.com/evanw/esbuild/pkg/api"
+	"github.com/UltiRequiem/kimera/core/types"
 	"github.com/lithdew/quickjs"
 )
 
@@ -50,7 +51,7 @@ func RunFile(opts RunOptions) error {
 	globals := ctx.Globals()
 	
 	// Set up permission context and pass to globals
-	permissions := PermissionContext{
+	permissions := types.PermissionContext{
 		AllowFS:  opts.AllowFS,
 		AllowNet: opts.AllowNet,
 		AllowEnv: opts.AllowEnv,

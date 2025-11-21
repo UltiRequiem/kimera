@@ -1,4 +1,4 @@
-package core
+package types
 
 import (
 	"net/http"
@@ -31,12 +31,17 @@ type ServerRequest struct {
 // ServerState holds the state of HTTP servers
 type ServerState struct {
 	sync.Mutex
-	servers  map[string]*http.Server
-	channels map[string]chan ServerRequest
-	nextID   int
+	Servers  map[string]*http.Server
+	Channels map[string]chan ServerRequest
+	NextID   int
+}
+
+// GetServerState returns the global server state instance
+func GetServerState() *ServerState {
+	return serverState
 }
 
 var serverState = &ServerState{
-	servers:  make(map[string]*http.Server),
-	channels: make(map[string]chan ServerRequest),
+	Servers:  make(map[string]*http.Server),
+	Channels: make(map[string]chan ServerRequest),
 }

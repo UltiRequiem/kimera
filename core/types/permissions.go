@@ -1,4 +1,4 @@
-package core
+package types
 
 // PermissionContext holds the permission flags for runtime operations
 type PermissionContext struct {

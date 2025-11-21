@@ -1,4 +1,4 @@
-package core
+package handlers
 
 import (
 	"bytes"
@@ -8,11 +8,12 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/UltiRequiem/kimera/core/types"
 	"github.com/lithdew/quickjs"
 )
 
-// handleFetch handles HTTP fetch operations
-func handleFetch(ctx *quickjs.Context, args []quickjs.Value, permissions PermissionContext) quickjs.Value {
+// Fetch handles HTTP fetch operations
+func Fetch(ctx *quickjs.Context, args []quickjs.Value, permissions types.PermissionContext) quickjs.Value {
 	if !permissions.AllowNet {
 		return ctx.ThrowError(fmt.Errorf("network access denied. Use --net flag to allow"))
 	}
