@@ -292,7 +292,25 @@ The documentation includes:
 - Examples and tutorials
 - Testing documentation
 
-The documentation is automatically generated from all `.md` files in the repository and deployed to GitHub Pages on every push to the main branch or when a pull request updates Markdown files.
+### How Documentation Works
+
+Documentation is automatically generated and deployed:
+
+1. **Automatic Deployment**: The `.github/workflows/deploy-docs.yaml` workflow automatically deploys documentation to GitHub Pages when:
+   - A pull request updates any `.md` file
+   - Changes are pushed to the `main` branch that affect `.md` files
+
+2. **Documentation Sources**: All Markdown files in the repository (except those in `.github/` and `node_modules/`) are:
+   - Converted to styled HTML pages
+   - Listed in an auto-generated index page
+   - Deployed to the `gh-pages` branch
+
+3. **Contributing to Documentation**: To update documentation:
+   - Edit any `.md` file in the repository
+   - Submit a pull request
+   - Documentation is automatically deployed when the PR is merged
+
+No manual steps are required to deploy documentation updates.
 
 ## Roadmap
 

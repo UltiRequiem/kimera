@@ -28,9 +28,6 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install dependencies
-        run: npm install -g marked
-
       - name: Create deployment directory
         run: mkdir -p deploy
 
@@ -143,6 +140,11 @@ jobs:
           
           # Process each markdown file
           while IFS= read -r file; do
+              # Skip empty lines
+              [[ -z "$file" ]] && continue
+              # Validate file exists and is a regular file
+              [[ ! -f "$file" ]] && continue
+              
               # Remove leading ./ from path
               clean_path="${file#./}"
               # Create HTML filename
