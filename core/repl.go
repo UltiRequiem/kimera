@@ -41,7 +41,7 @@ func Repl() error {
 	reader := bufio.NewReader(os.Stdin)
 	buffer := ""
 
-	for{
+	for {
 		fmt.Print("> ")
 
 		line, err := reader.ReadString('\n')

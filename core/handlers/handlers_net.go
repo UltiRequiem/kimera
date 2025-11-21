@@ -21,12 +21,12 @@ func Fetch(ctx *quickjs.Context, args []quickjs.Value, permissions types.Permiss
 		return ctx.ThrowTypeError("fetch requires a URL")
 	}
 	url := args[1].String()
-	
+
 	// Default options
 	method := "GET"
 	var body io.Reader
 	headers := make(map[string]string)
-	
+
 	// Parse options if provided
 	if len(args) >= 3 && !args[2].IsNull() && !args[2].IsUndefined() {
 		optionsJSON := args[2].String()
@@ -47,18 +47,18 @@ func Fetch(ctx *quickjs.Context, args []quickjs.Value, permissions types.Permiss
 			}
 		}
 	}
-	
+
 	// Create request
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return ctx.ThrowError(err)
 	}
-	
+
 	// Set headers
 	for key, val := range headers {
 		req.Header.Set(key, val)
 	}
-	
+
 	// Make request
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -66,13 +66,13 @@ func Fetch(ctx *quickjs.Context, args []quickjs.Value, permissions types.Permiss
 		return ctx.ThrowError(err)
 	}
 	defer resp.Body.Close()
-	
+
 	// Read response body
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return ctx.ThrowError(err)
 	}
-	
+
 	// Create response object
 	responseHeaders := make(map[string]string)
 	for key, values := range resp.Header {
@@ -80,7 +80,7 @@ func Fetch(ctx *quickjs.Context, args []quickjs.Value, permissions types.Permiss
 			responseHeaders[key] = values[0]
 		}
 	}
-	
+
 	responseObj := map[string]interface{}{
 		"ok":         resp.StatusCode >= 200 && resp.StatusCode < 300,
 		"status":     resp.StatusCode,
@@ -89,11 +89,11 @@ func Fetch(ctx *quickjs.Context, args []quickjs.Value, permissions types.Permiss
 		"body":       string(responseBody),
 		"url":        url,
 	}
-	
+
 	responseJSON, err := json.Marshal(responseObj)
 	if err != nil {
 		return ctx.ThrowError(err)
 	}
-	
+
 	return ctx.String(string(responseJSON))
 }
