@@ -280,6 +280,20 @@ go build
 go test ./...
 ```
 
+## Documentation
+
+The full documentation for Kimera.js is available online at GitHub Pages. It is automatically deployed from Markdown files in the repository whenever changes are made.
+
+**[View Documentation](https://ultirequiem.github.io/kimera/)**
+
+The documentation includes:
+- Complete API reference
+- Getting started guides
+- Examples and tutorials
+- Testing documentation
+
+The documentation is automatically generated from all `.md` files in the repository and deployed to GitHub Pages on every push to the main branch or when a pull request updates Markdown files.
+
 ## Roadmap
 
 - [ ] Module system (import/export)

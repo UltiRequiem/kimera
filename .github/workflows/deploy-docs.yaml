@@ -1,0 +1,330 @@
+name: Deploy Docs to GitHub Pages
+
+on:
+  pull_request:
+    paths:
+      - '**.md'
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+    paths:
+      - '**.md'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install -g marked
+
+      - name: Create deployment directory
+        run: mkdir -p deploy
+
+      - name: Convert Markdown to HTML and copy files
+        run: |
+          # Find all markdown files (excluding .github and node_modules directories)
+          find . -name "*.md" ! -path "./.github/*" ! -path "*/node_modules/*" -type f > md_files.txt
+          
+          # Create index HTML
+          cat > deploy/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Kimera.js Documentation</title>
+              <style>
+                  * {
+                      margin: 0;
+                      padding: 0;
+                      box-sizing: border-box;
+                  }
+                  body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                      line-height: 1.6;
+                      color: #333;
+                      background: #f5f5f5;
+                  }
+                  .container {
+                      max-width: 1200px;
+                      margin: 0 auto;
+                      padding: 2rem;
+                  }
+                  header {
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      color: white;
+                      padding: 3rem 0;
+                      margin-bottom: 2rem;
+                      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                  }
+                  header h1 {
+                      font-size: 2.5rem;
+                      margin-bottom: 0.5rem;
+                  }
+                  header p {
+                      font-size: 1.1rem;
+                      opacity: 0.9;
+                  }
+                  .docs-grid {
+                      display: grid;
+                      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                      gap: 1.5rem;
+                      margin-top: 2rem;
+                  }
+                  .doc-card {
+                      background: white;
+                      border-radius: 8px;
+                      padding: 1.5rem;
+                      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                      transition: transform 0.2s, box-shadow 0.2s;
+                      text-decoration: none;
+                      color: inherit;
+                      display: block;
+                  }
+                  .doc-card:hover {
+                      transform: translateY(-4px);
+                      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                  }
+                  .doc-card h3 {
+                      color: #667eea;
+                      margin-bottom: 0.5rem;
+                      font-size: 1.3rem;
+                  }
+                  .doc-card p {
+                      color: #666;
+                      font-size: 0.95rem;
+                  }
+                  .doc-icon {
+                      font-size: 2rem;
+                      margin-bottom: 0.5rem;
+                  }
+                  footer {
+                      text-align: center;
+                      margin-top: 3rem;
+                      padding: 2rem 0;
+                      color: #666;
+                      border-top: 1px solid #ddd;
+                  }
+                  .badge {
+                      display: inline-block;
+                      padding: 0.25rem 0.75rem;
+                      background: #e0e7ff;
+                      color: #4c51bf;
+                      border-radius: 12px;
+                      font-size: 0.85rem;
+                      margin-top: 0.5rem;
+                  }
+              </style>
+          </head>
+          <body>
+              <header>
+                  <div class="container">
+                      <h1>📚 Kimera.js Documentation</h1>
+                      <p>A minimal JavaScript/TypeScript runtime written in Go</p>
+                  </div>
+              </header>
+              <main class="container">
+                  <div class="docs-grid">
+          EOF
+          
+          # Process each markdown file
+          while IFS= read -r file; do
+              # Remove leading ./ from path
+              clean_path="${file#./}"
+              # Create HTML filename
+              html_file="${clean_path%.md}.html"
+              # Get filename without path
+              filename=$(basename "$clean_path")
+              # Get directory name (if any)
+              dirname=$(dirname "$clean_path")
+              
+              # Determine document type and description
+              case "$filename" in
+                  readme.md|README.md)
+                      title="README"
+                      description="Getting started guide and project overview"
+                      icon="📖"
+                      ;;
+                  API.md)
+                      title="API Documentation"
+                      description="Complete API reference for Kimera.js"
+                      icon="🔧"
+                      ;;
+                  *)
+                      title="${filename%.md}"
+                      description="Documentation from $dirname"
+                      icon="📄"
+                      ;;
+              esac
+              
+              # Convert markdown to HTML
+              echo "Processing $file..."
+              cat > "deploy/$html_file.tmp" << 'HTMLEOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          HTMLEOF
+              echo "    <title>$title - Kimera.js</title>" >> "deploy/$html_file.tmp"
+              cat >> "deploy/$html_file.tmp" << 'HTMLEOF'
+              <style>
+                  * {
+                      margin: 0;
+                      padding: 0;
+                      box-sizing: border-box;
+                  }
+                  body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                      line-height: 1.6;
+                      color: #333;
+                      background: #f5f5f5;
+                      padding: 2rem;
+                  }
+                  .container {
+                      max-width: 900px;
+                      margin: 0 auto;
+                      background: white;
+                      padding: 3rem;
+                      border-radius: 8px;
+                      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                  }
+                  .back-link {
+                      display: inline-block;
+                      margin-bottom: 2rem;
+                      color: #667eea;
+                      text-decoration: none;
+                      font-weight: 500;
+                  }
+                  .back-link:hover {
+                      text-decoration: underline;
+                  }
+                  h1, h2, h3, h4, h5, h6 {
+                      margin-top: 1.5rem;
+                      margin-bottom: 1rem;
+                      color: #2d3748;
+                  }
+                  h1 { font-size: 2.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+                  h2 { font-size: 2rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
+                  h3 { font-size: 1.5rem; }
+                  h4 { font-size: 1.25rem; }
+                  p { margin-bottom: 1rem; }
+                  code {
+                      background: #f7fafc;
+                      padding: 0.2rem 0.4rem;
+                      border-radius: 3px;
+                      font-family: 'Courier New', Courier, monospace;
+                      font-size: 0.9em;
+                      color: #e83e8c;
+                  }
+                  pre {
+                      background: #2d3748;
+                      color: #e2e8f0;
+                      padding: 1rem;
+                      border-radius: 5px;
+                      overflow-x: auto;
+                      margin-bottom: 1rem;
+                  }
+                  pre code {
+                      background: none;
+                      color: inherit;
+                      padding: 0;
+                  }
+                  ul, ol {
+                      margin-left: 2rem;
+                      margin-bottom: 1rem;
+                  }
+                  li {
+                      margin-bottom: 0.5rem;
+                  }
+                  a {
+                      color: #667eea;
+                      text-decoration: none;
+                  }
+                  a:hover {
+                      text-decoration: underline;
+                  }
+                  blockquote {
+                      border-left: 4px solid #667eea;
+                      padding-left: 1rem;
+                      margin: 1rem 0;
+                      color: #666;
+                      font-style: italic;
+                  }
+                  table {
+                      width: 100%;
+                      border-collapse: collapse;
+                      margin-bottom: 1rem;
+                  }
+                  th, td {
+                      padding: 0.75rem;
+                      text-align: left;
+                      border-bottom: 1px solid #e2e8f0;
+                  }
+                  th {
+                      background: #f7fafc;
+                      font-weight: 600;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <a href="index.html" class="back-link">← Back to Documentation Index</a>
+          HTMLEOF
+              
+              # Convert markdown to HTML and append
+              npx marked "$file" >> "deploy/$html_file.tmp"
+              
+              echo "    </div>" >> "deploy/$html_file.tmp"
+              echo "</body>" >> "deploy/$html_file.tmp"
+              echo "</html>" >> "deploy/$html_file.tmp"
+              
+              # Move to final location
+              mv "deploy/$html_file.tmp" "deploy/$html_file"
+              
+              # Add card to index
+              cat >> deploy/index.html << EOF
+                      <a href="$html_file" class="doc-card">
+                          <div class="doc-icon">$icon</div>
+                          <h3>$title</h3>
+                          <p>$description</p>
+                          <span class="badge">${dirname}</span>
+                      </a>
+          EOF
+          done < md_files.txt
+          
+          # Complete the index HTML
+          cat >> deploy/index.html << 'EOF'
+                  </div>
+              </main>
+              <footer>
+                  <p>Generated automatically from Markdown files • <a href="https://github.com/UltiRequiem/kimera">View on GitHub</a></p>
+              </footer>
+          </body>
+          </html>
+          EOF
+          
+          echo "✅ Documentation generated successfully"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: 'Deploy documentation from ${{ github.sha }}'
