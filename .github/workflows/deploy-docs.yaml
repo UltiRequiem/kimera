@@ -173,6 +173,10 @@ jobs:
                       ;;
               esac
               
+              # Create subdirectories if needed
+              html_dir=$(dirname "deploy/$html_file")
+              mkdir -p "$html_dir"
+              
               # Convert markdown to HTML
               echo "Processing $file..."
               cat > "deploy/$html_file.tmp" << 'HTMLEOF'
